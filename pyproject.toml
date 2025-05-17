@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=42.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prompt_optimizer"
+version = "0.1.0"
+description = "A tool to optimize prompts using DSPy framework"
+authors = [
+    {name = "Manus"}
+]
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+]
