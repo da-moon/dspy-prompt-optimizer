@@ -3,9 +3,8 @@ DSPy-based prompt optimization module.
 """
 
 import dspy
-from typing import Optional, Dict, Any, List
-import anthropic
 import logging
+from typing import Any
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -83,9 +82,9 @@ class SelfRefinementOptimizer(PromptOptimizer):
         
         # Create a module that uses the signature
         refiner = dspy.Predict(PromptRefiner)
-        
+
         # Apply the module to refine the prompt
-        result = refiner(prompt=prompt_text)
+        result: Any = refiner(prompt=prompt_text)
         
         if self.verbose:
             logger.info(f"Analysis: {result.analysis}")
@@ -144,7 +143,7 @@ class ExampleBasedOptimizer(PromptOptimizer):
             refiner.update_demos([example])
         
         # Apply the module with learned examples to refine the prompt
-        result = refiner(prompt=prompt_text)
+        result: Any = refiner(prompt=prompt_text)
         
         if self.verbose and result:
             logger.info(f"Analysis: {result.analysis}")
@@ -198,7 +197,7 @@ class MetricBasedOptimizer(PromptOptimizer):
         for i in range(max_iterations):
             if i == 0:
                 # Evaluate the original prompt
-                evaluation = evaluator(prompt=best_prompt)
+                evaluation: Any = evaluator(prompt=best_prompt)
                 best_score = int(evaluation.total_score)
                 
                 if self.verbose:
@@ -206,11 +205,11 @@ class MetricBasedOptimizer(PromptOptimizer):
                     logger.info(f"Feedback: {evaluation.feedback}")
             
             # Generate an improved prompt
-            result = generator(original_prompt=best_prompt)
+            result: Any = generator(original_prompt=best_prompt)
             candidate_prompt = result.improved_prompt
             
             # Evaluate the candidate prompt
-            evaluation = evaluator(prompt=candidate_prompt)
+            evaluation: Any = evaluator(prompt=candidate_prompt)
             candidate_score = int(evaluation.total_score)
             
             if self.verbose:

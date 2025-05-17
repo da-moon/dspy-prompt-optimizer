@@ -4,7 +4,6 @@ Command-line interface for DSPy Prompt Optimizer.
 
 import sys
 import click
-from pathlib import Path
 from typing import Optional, TextIO
 
 from .optimizer import optimize_prompt
@@ -49,7 +48,7 @@ def main(input_prompt: TextIO, output: TextIO, model: str, api_key: Optional[str
         )
         
         # Write the optimized prompt to the output
-        output.write(optimized_prompt)
+        _ = output.write(optimized_prompt)
         
         if verbose:
             click.echo("Prompt optimization complete!", err=True)
