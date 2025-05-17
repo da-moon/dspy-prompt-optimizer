@@ -1,5 +1,6 @@
 {
   "include": ["prompt_optimizer"],
+  "extraPaths": ["typings"],
   "ignore": [],
   "strict": [],
   "reportMissingImports": "error",
