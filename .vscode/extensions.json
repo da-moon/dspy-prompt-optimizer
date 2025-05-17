@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.black-formatter",
+    "ms-python.isort",
+    "matangover.mypy",
+    "tamasfe.even-better-toml",
+    "sourcery.sourcery",
+    "charliermarsh.ruff",
+    "streetsidesoftware.code-spell-checker",
+    "gruntfuggly.todo-tree",
+    "ms-python.debugpy"
+  ]
+}

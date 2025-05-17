@@ -1,0 +1,30 @@
+# Exclude everything by default
+*
+
+# Include application code
+!prompt_optimizer
+!*.py
+
+# Include project files
+!pyproject.toml
+!poetry.lock
+!poetry.toml
+!README.md
+!LICENSE
+
+# Exclude non-needed Python files
+**/__pycache__
+**/*.py[cod]
+**/*$py.class
+**/.pytest_cache
+**/.coverage
+**/.mypy_cache
+
+# Exclude environment and development files
+.env
+.git
+.github
+.gitignore
+.vscode
+.idea
+**/.DS_Store

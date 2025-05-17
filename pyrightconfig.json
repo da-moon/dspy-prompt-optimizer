@@ -1,0 +1,23 @@
+{
+  "ignore": [],
+  "strict": [],
+  "reportMissingImports": "warning",
+  "reportMissingTypeStubs": "warning",
+  "reportUnusedImport": "warning",
+  "reportUnusedVariable": "warning",
+  "reportUnusedFunction": "warning",
+  "reportUnusedClass": "warning",
+  "reportPrivateUsage": "warning",
+  "reportConstantRedefinition": "warning",
+  "reportIncompatibleMethodOverride": "warning",
+  "reportInvalidStringEscapeSequence": "warning",
+  "typeCheckingMode": "basic",
+  "useLibraryCodeForTypes": true,
+  "enableTypeIgnoreComments": true,
+  "autoSearchPaths": true,
+  "indexing": true,
+  "autoImportCompletions": true,
+  "completeFunctionParens": true,
+  "venvPath": ".",
+  "venv": ".venv"
+}

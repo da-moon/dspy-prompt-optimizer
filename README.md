@@ -1,58 +1,92 @@
 # DSPy Prompt Optimizer
 
-A Python CLI tool that uses the DSPy framework to optimize prompts for large language models, with a focus on improving prompts for thinking models like Claude Sonnet 3.7.
+A Python CLI tool that uses the DSPy framework to optimize prompts for large
+language models, with a focus on improving prompts for thinking models like
+Claude Sonnet 3.7.
 
 ## Table of Contents
 
 - [Introduction to DSPy](#introduction-to-dspy)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Using Poetry Commands](#using-poetry-commands)
 - [Understanding DSPy Concepts](#understanding-dspy-concepts)
 - [Optimization Approaches](#optimization-approaches)
 - [Example Workflow](#example-workflow)
+- [Build and Packaging](#build-and-packaging)
+- [Development Setup](#development-setup)
 - [Troubleshooting](#troubleshooting)
 - [Future Enhancements](#future-enhancements)
 
 ## Introduction to DSPy
 
-DSPy (Declarative Self-improving Prompting) is a framework for programming with foundation models. Unlike traditional prompt engineering, DSPy allows you to:
+DSPy (Declarative Self-improving Prompting) is a framework for programming with
+foundation models. Unlike traditional prompt engineering, DSPy allows you to:
 
 1. **Declare what you want** rather than how to get it
 2. **Optimize prompts automatically** based on examples or metrics
 3. **Compose complex pipelines** of language model calls
 4. **Improve performance systematically** through teleprompters and optimizers
 
-DSPy was developed by researchers at Stanford, and it represents a significant advancement in how we interact with and optimize language models.
+DSPy was developed by researchers at Stanford, and it represents a significant
+advancement in how we interact with and optimize language models.
 
 ## Installation
 
 ### Prerequisites
 
 - Python 3.10 or higher (but less than 3.13 due to dependency constraints)
-- Virtual environment (recommended)
+- Poetry (dependency management tool)
+
+### Installing Poetry
+
+If you don't have Poetry installed, you can install it following the
+[official instructions](https://python-poetry.org/docs/#installation):
+
+**On Linux, macOS, Windows (WSL):**
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+**On Windows (PowerShell):**
+
+```powershell
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+```
+
+Verify the installation:
+
+```bash
+poetry --version
+```
 
 ### Setup
 
 1. Clone this repository:
+
    ```bash
    git clone https://github.com/yourusername/dspy-prompt-optimizer.git
    cd dspy-prompt-optimizer
    ```
 
-2. Create and activate a virtual environment:
+2. Install dependencies using Poetry:
+
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   poetry install
    ```
 
-3. Install the package:
-   ```bash
-   pip install -e .
-   ```
+   This will:
+
+   - Create a virtual environment for the project
+   - Install all required dependencies
+   - Install development dependencies if you add the `--with dev` flag
 
 ### Dependency Notes
 
-DSPy has complex dependency requirements. If you encounter issues with Poetry installation, the recommended approach is to use pip with a virtual environment as shown above.
+DSPy has complex dependency requirements which are handled automatically by
+Poetry. The project's `pyproject.toml` file specifies the exact version
+constraints needed for compatibility.
 
 ## Usage
 
@@ -60,55 +94,120 @@ The DSPy Prompt Optimizer can be used as a command-line tool:
 
 ```bash
 # Basic usage (reads from stdin, outputs to stdout)
-cat your_prompt.txt | dspy-prompt-optimizer
+cat your_prompt.txt | poetry run dspy-prompt-optimizer
 
 # Specify input and output files
-dspy-prompt-optimizer your_prompt.txt -o optimized_prompt.txt
+poetry run dspy-prompt-optimizer your_prompt.txt -o optimized_prompt.txt
 
 # Choose optimization approach
-dspy-prompt-optimizer your_prompt.txt -t example
+poetry run dspy-prompt-optimizer your_prompt.txt -t example
 
 # Enable verbose output
-dspy-prompt-optimizer your_prompt.txt -v
+poetry run dspy-prompt-optimizer your_prompt.txt -v
 ```
 
 ### Command-line Options
 
 - `INPUT_PROMPT`: File containing the prompt to optimize (defaults to stdin)
 - `--output, -o`: Output file for the optimized prompt (defaults to stdout)
-- `--model, -m`: Model to use for optimization (defaults to claude-3-sonnet-20240229)
-- `--api-key, -k`: Anthropic API key (can also be set via ANTHROPIC_API_KEY environment variable)
-- `--optimization-type, -t`: Type of optimization to perform: self, example, or metric (defaults to self)
+- `--model, -m`: Model to use for optimization (defaults to
+  claude-3-sonnet-20240229)
+- `--api-key, -k`: Anthropic API key (can also be set via ANTHROPIC_API_KEY
+  environment variable)
+- `--optimization-type, -t`: Type of optimization to perform: self, example, or
+  metric (defaults to self)
 - `--verbose, -v`: Enable verbose output
+
+## Using Poetry Commands
+
+Poetry provides a streamlined way to work with Python packages and
+dependencies. Here's how to use Poetry with DSPy Prompt Optimizer:
+
+### Running Commands
+
+Poetry automatically manages the virtual environment for you. To run the tool,
+use:
+
+```bash
+# Run the tool using Poetry
+poetry run dspy-prompt-optimizer [arguments]
+```
+
+### Activating the Virtual Environment
+
+If you prefer to activate the virtual environment and then run commands
+directly:
+
+```bash
+# Activate the Poetry virtual environment
+poetry shell
+
+# Now you can run the tool directly
+dspy-prompt-optimizer [arguments]
+
+# When finished, exit the Poetry shell
+exit
+```
+
+### Managing Dependencies
+
+Poetry automatically handles all dependencies based on the `pyproject.toml`
+file:
+
+```bash
+# Add a new dependency
+poetry add package-name
+
+# Add a development dependency
+poetry add --group dev package-name
+
+# Update dependencies
+poetry update
+```
+
+### Available Scripts
+
+The following scripts are available through Poetry:
+
+```bash
+# Run the main prompt optimizer
+poetry run dspy-prompt-optimizer
+```
 
 ## Understanding DSPy Concepts
 
-DSPy introduces several key concepts that make it powerful for prompt optimization:
+DSPy introduces several key concepts that make it powerful for prompt
+optimization:
 
 ### 1. Signatures
 
-Signatures in DSPy define the inputs and outputs of language model operations. They're like function signatures but for LM interactions:
+Signatures in DSPy define the inputs and outputs of language model operations.
+They're like function signatures but for LM interactions:
 
 ```python
 class PromptRefiner(dspy.Signature):
     """Refine a prompt to make it more effective."""
-    
+
     prompt = dspy.InputField(desc="The original prompt that needs refinement")
     analysis = dspy.OutputField(desc="Analysis of the prompt's strengths and weaknesses")
     improved_prompt = dspy.OutputField(desc="A refined version of the prompt")
 ```
 
-This declarative approach allows DSPy to understand what you want from the model.
+This declarative approach allows DSPy to understand what you want from the
+model.
 
 ### 2. Modules
 
-DSPy modules are the building blocks that use signatures to perform specific tasks:
+DSPy modules are the building blocks that use signatures to perform specific
+tasks:
 
 - **Predict**: Simple prediction based on a signature
 - **ChainOfThought**: Adds reasoning steps before producing outputs
-- **MultiChainOfThought**: Generates multiple reasoning paths and selects the best one
+- **MultiChainOfThought**: Generates multiple reasoning paths and selects the
+  best one
 
 Example:
+
 ```python
 refiner = dspy.Predict(PromptRefiner)  # Simple prediction
 refiner = dspy.ChainOfThought(PromptRefiner)  # With reasoning steps
@@ -116,7 +215,8 @@ refiner = dspy.ChainOfThought(PromptRefiner)  # With reasoning steps
 
 ### 3. Optimizers
 
-Optimizers (formerly called Teleprompters) are DSPy's optimization engines. They take examples and metrics to improve module performance:
+Optimizers (formerly called Teleprompters) are DSPy's optimization engines.
+They take examples and metrics to improve module performance:
 
 ```python
 # Example of using a DSPy optimizer
@@ -125,11 +225,13 @@ optimizer = BootstrapFewShot(max_bootstrapped_demos=3)
 compiled_module = optimizer.compile(module=refiner, trainset=examples, metric=my_metric)
 ```
 
-This process automatically generates better prompts based on the examples and metrics provided.
+This process automatically generates better prompts based on the examples and
+metrics provided.
 
 ### 4. LM Configuration
 
-DSPy abstracts away the specifics of different LM providers, making it easy to switch between them:
+DSPy abstracts away the specifics of different LM providers, making it easy to
+switch between them:
 
 ```python
 lm = dspy.LM('anthropic/claude-3-sonnet-20240229', api_key="your-api-key")
@@ -142,7 +244,9 @@ This tool implements three different approaches to prompt optimization:
 
 ### 1. Self-Refinement
 
-The self-refinement approach uses the language model to analyze and improve its own prompts. It:
+The self-refinement approach uses the language model to analyze and improve its
+own prompts. It:
+
 - Analyzes the strengths and weaknesses of the original prompt
 - Generates an improved version addressing the identified issues
 - Does not require examples or metrics
@@ -151,30 +255,39 @@ This is the simplest approach and works well for many use cases.
 
 ### 2. Example-Based Optimization
 
-Example-based optimization uses examples of good prompts to guide the improvement process:
+Example-based optimization uses examples of good prompts to guide the
+improvement process:
+
 - Learns patterns from examples of original prompts and their improved versions
 - Applies these patterns to new prompts
 - Requires curated examples of good prompt transformations
 
-This approach is more powerful when you have specific examples of the kinds of improvements you want.
+This approach is more powerful when you have specific examples of the kinds of
+improvements you want.
 
-**Note:** In the current implementation with DSPy 2.6.23, the example-based optimization approach has compatibility issues due to API changes in DSPy. This is documented as a known limitation and may require updates as DSPy evolves.
+**Note:** In the current implementation with DSPy 2.6.23, the example-based
+optimization approach has compatibility issues due to API changes in DSPy. This
+is documented as a known limitation and may require updates as DSPy evolves.
 
 ### 3. Metric-Based Optimization
 
-Metric-based optimization iteratively improves prompts based on quantifiable metrics:
+Metric-based optimization iteratively improves prompts based on quantifiable
+metrics:
+
 - Defines metrics like clarity, specificity, and actionability
 - Generates candidate improvements and evaluates them
 - Keeps the best-performing version
 - Can run for multiple iterations to progressively improve
 
-This approach is the most sophisticated and can achieve the best results with sufficient iterations.
+This approach is the most sophisticated and can achieve the best results with
+sufficient iterations.
 
 ## Example Workflow
 
 Here's a typical workflow for optimizing a prompt for Claude Sonnet 3.7:
 
 1. Start with a basic prompt idea:
+
    ```
    I have noticed thinking LLMs such as Claude Sonnet 3.7 tend to have tendencies to go down rabbit holes, go on sidequests and loose the original mission statement; they often blow out the scope of the request and make things a lot more complicated; It's like they have ADHD and OCD at the same time;
 
@@ -182,48 +295,59 @@ Here's a typical workflow for optimizing a prompt for Claude Sonnet 3.7:
    ```
 
 2. Save this to a file:
+
    ```bash
    echo "Your prompt text..." > original_prompt.txt
    ```
 
 3. Run the optimizer:
+
    ```bash
    export ANTHROPIC_API_KEY="your-api-key"
-   dspy-prompt-optimizer original_prompt.txt -o optimized_prompt.txt -t metric -v
+   poetry run dspy-prompt-optimizer original_prompt.txt -o optimized_prompt.txt -t metric -v
    ```
 
 4. Review the optimized prompt in `optimized_prompt.txt`
 
 5. Try different optimization approaches to compare results:
-   ```bash
-   dspy-prompt-optimizer original_prompt.txt -o optimized_self.txt -t self -v
-   dspy-prompt-optimizer original_prompt.txt -o optimized_example.txt -t example -v
-   dspy-prompt-optimizer original_prompt.txt -o optimized_metric.txt -t metric -v
-   ```
+   ````bash
+   poetry run dspy-prompt-optimizer original_prompt.txt -o optimized_self.txt -t self -v
+   poetry run dspy-prompt-optimizer original_prompt.txt -o optimized_example.txt -t example -v
+   poetry run dspy-prompt-optimizer original_prom   ```
+   ````
+
+## Build and Packaging
+
+Poetry makes it eas
 
 ## Troubleshooting
 
 ### API Key Issues
 
 If you encounter errors related to the API key:
-- Ensure you've set the `ANTHROPIC_API_KEY` environment variable or passed it with `-k`
+
+- Ensure you've set the `ANTHROPIC_API_KEY` environment variable or passed it
+  with `-k`
 - Verify the API key is valid and has not expired
-- Check for any whitespace or special characters that might have been copied with the key
+- Check for any whitespace or special characters that might have been copied
+  with the key
+
+### Poetry Issues
+
+If you encounter issues with Poetry:
+
+- **Poetry installation fails**: Refer to the
+  [official installation documentation](https://python-poetry.org/docs/#installation)
+- **Dependency resolution takes too long**: Try
+  `poetry add packagename --no-update` and then run `poetry update` separately
+- **Virtual environment not activating**: Use `poetry env info` to debug
+  environment issues
+- **Unknown command errors**: Ensure you're running Poetry commands from the
+  project root directory
+- **Version conflicts**: Check your `pyproject.toml` file for dependency
+  version constraints
 
 ### Dependency Issues
-
-DSPy has complex dependencies that can sometimes conflict:
-- Use a fresh virtual environment to avoid conflicts with existing packages
-- If using Poetry fails, try direct pip installation in a virtual environment
-- Ensure you're using Python 3.10-3.12 as some dependencies have specific version requirements
-
-### Optimization Quality
-
-If the optimized prompts aren't improving as expected:
-- Try a different optimization approach (`-t` option)
-- Enable verbose mode (`-v`) to see the analysis and reasoning
-- Consider providing better examples if using example-based optimization
-- Increase iterations for metric-based optimization (requires code modification)
 
 ## Future Enhancements
 
@@ -238,6 +362,6 @@ Potential improvements for future versions:
 - Additional optimization approaches
 - Persistent storage of optimization history
 
----
-
-This project was created to demonstrate DSPy's capabilities for prompt optimization. For more information about DSPy, visit the [official DSPy documentation](https://dspy-docs.vercel.app/).
+This project was created to demonstrate DSPy's capabilities for prompt
+optimization. For more information about DSPy, visit the
+[official DSPy documentation](https://dspy-docs.vercel.app/).
