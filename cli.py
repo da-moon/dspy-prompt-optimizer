@@ -4,7 +4,6 @@ Command-line interface for DSPy Prompt Optimizer.
 
 import sys
 import click
-from pathlib import Path
 from typing import Optional, TextIO
 
 from .optimizer import optimize_prompt

@@ -3,8 +3,6 @@ DSPy-based prompt optimization module.
 """
 
 import dspy
-from typing import Optional, Dict, Any, List
-import anthropic
 import logging
 
 # Configure logging
