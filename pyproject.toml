@@ -75,6 +75,7 @@ warn_return_any = true
 warn_unreachable = true
 
 [tool.pytest.ini_options]
+addopts = "-vv"
 testpaths = ["tests"]
 python_files = "test_*.py"
 python_functions = "test_*"
