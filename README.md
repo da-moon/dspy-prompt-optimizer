@@ -162,6 +162,19 @@ poetry run dspy-prompt-optimizer your_prompt.txt -v
   metric (defaults to self)
 - `--verbose, -v`: Enable verbose output
 
+### Batch processing
+
+Optimize many prompts at once with the `batch` subcommand. The argument can be
+a directory of prompt files or a text file containing one prompt per line.
+
+```bash
+# Optimize all files in the prompts directory
+poetry run dspy-prompt-optimizer batch prompts/ -o optimized/
+
+# Optimize prompts listed in a file
+poetry run dspy-prompt-optimizer batch prompts.txt -o optimized/
+```
+
 ## Using Poetry Commands
 
 Poetry provides a streamlined way to work with Python packages and
@@ -431,7 +444,6 @@ Potential improvements for future versions:
 - Custom optimization metrics definition
 - User interface for interactive prompt optimization
 - Integration with prompt management systems
-- Batch processing of multiple prompts
 - Fine-tuning optimization parameters
 - Additional optimization approaches
 - Persistent storage of optimization history
