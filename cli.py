@@ -14,8 +14,8 @@ from .optimizer import optimize_prompt
 @click.argument('input_prompt', type=click.File('r'), default=sys.stdin)
 @click.option('--output', '-o', type=click.File('w'), default=sys.stdout,
               help='Output file for the optimized prompt. Defaults to stdout.')
-@click.option('--model', '-m', default='claude-3-sonnet-20240229',
-              help='Model to use for optimization. Defaults to claude-3-sonnet-20240229.')
+@click.option('--model', '-m', default='claude-3-7-sonnet-latest',
+              help='Model to use for optimization. Defaults to claude-3-7-sonnet-latest.')
 @click.option('--api-key', '-k', envvar='ANTHROPIC_API_KEY',
               help='Anthropic API key. Can also be set via ANTHROPIC_API_KEY environment variable.')
 @click.option('--optimization-type', '-t', type=click.Choice(['self', 'example', 'metric']), default='self',

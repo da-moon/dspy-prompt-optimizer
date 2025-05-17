@@ -76,11 +76,11 @@ poetry --version
    poetry install
    ```
 
-   This will:
+This will:
 
-   - Create a virtual environment for the project
-   - Install all required dependencies
-   - Install development dependencies if you add the `--with dev` flag
+- Create a virtual environment for the project
+- Install all required dependencies
+- Install development dependencies if you add the `--with dev` flag
 
 ### Dependency Notes
 
@@ -90,14 +90,16 @@ constraints needed for compatibility.
 
 ### Using pyenv
 
-Since this project requires Python >=3.10,<3.13, you may need to use pyenv to manage Python versions if your system Python is incompatible (e.g., Python 3.13+).
+Since this project requires Python >=3.10,<3.13, you may need to use pyenv to
+manage Python versions if your system Python is incompatible (e.g., Python
+3.13+).
 
 1. Install pyenv if not already installed:
 
    ```bash
    # On Linux/macOS
    curl https://pyenv.run | bash
-   
+
    # Add to your shell configuration (.bashrc, .zshrc, etc.)
    echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
    echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
@@ -109,7 +111,7 @@ Since this project requires Python >=3.10,<3.13, you may need to use pyenv to ma
    ```bash
    # List available Python versions
    pyenv install --list | grep " 3.1[0-2]"
-   
+
    # Install a specific version (e.g., Python 3.12.7)
    pyenv install 3.12.7
    ```
@@ -119,15 +121,16 @@ Since this project requires Python >=3.10,<3.13, you may need to use pyenv to ma
    ```bash
    # Verify available Python versions
    pyenv versions
-   
+
    # Configure Poetry to use a specific Python version
    poetry env use 3.12.7
-   
+
    # Verify Poetry environment configuration
    poetry env info
    ```
 
-This ensures that Poetry creates a virtual environment with a Python version compatible with the project requirements.
+This ensures that Poetry creates a virtual environment with a Python version
+compatible with the project requirements.
 
 ## Usage
 
@@ -152,7 +155,7 @@ poetry run dspy-prompt-optimizer your_prompt.txt -v
 - `INPUT_PROMPT`: File containing the prompt to optimize (defaults to stdin)
 - `--output, -o`: Output file for the optimized prompt (defaults to stdout)
 - `--model, -m`: Model to use for optimization (defaults to
-  claude-3-sonnet-20240229)
+  claude-3-7-sonnet-latest)
 - `--api-key, -k`: Anthropic API key (can also be set via ANTHROPIC_API_KEY
   environment variable)
 - `--optimization-type, -t`: Type of optimization to perform: self, example, or
@@ -275,7 +278,7 @@ DSPy abstracts away the specifics of different LM providers, making it easy to
 switch between them:
 
 ```python
-lm = dspy.LM('anthropic/claude-3-sonnet-20240229', api_key="your-api-key")
+lm = dspy.LM('anthropic/claude-3-7-sonnet-latest', api_key="your-api-key")
 dspy.configure(lm=lm)
 ```
 
@@ -394,30 +397,31 @@ If you encounter issues with Poetry:
 
 If you encounter Python version compatibility issues:
 
-- **Error message**: "The currently activated Python version X is not supported by the project (>=3.10,<3.13)"
+- **Error message**: "The currently activated Python version X is not supported
+  by the project (>=3.10,<3.13)"
 
 - **Solution**:
+
   1. Install a compatible Python version using pyenv:
      ```bash
      pyenv install 3.12.7  # or any version between 3.10 and 3.12
      ```
-  
   2. Configure Poetry to use this version:
      ```bash
      poetry env use 3.12.7
      ```
-  
   3. Check your Poetry environment configuration:
      ```bash
      poetry env info
      ```
-  
   4. List all Poetry environments:
      ```bash
      poetry env list
      ```
 
-- **Prevention**: Always check the Python version requirements in `pyproject.toml` before setting up the project. This project requires Python >=3.10,<3.13.
+- **Prevention**: Always check the Python version requirements in
+  `pyproject.toml` before setting up the project. This project requires
+  Python >=3.10,<3.13.
 
 ## Future Enhancements
 
