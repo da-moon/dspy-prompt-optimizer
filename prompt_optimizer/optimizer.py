@@ -3,8 +3,6 @@ DSPy-based prompt optimization module.
 """
 
 import dspy
-from typing import Optional, Dict, Any, List
-import anthropic
 import logging
 
 # Configure logging
@@ -15,7 +13,7 @@ logger = logging.getLogger(__name__)
 class PromptOptimizer:
     """Base class for prompt optimization strategies."""
     
-    def __init__(self, model: str, api_key: str, verbose: bool = False):
+    def __init__(self, model: str, api_key: str, verbose: bool = False) -> None:
         """
         Initialize the prompt optimizer.
         
@@ -30,7 +28,7 @@ class PromptOptimizer:
            # Set up DSPy with Anthropic
         self._setup_dspy()
     
-    def _setup_dspy(self):
+    def _setup_dspy(self) -> None:
         """Set up DSPy with the Anthropic model."""
         # Configure the LM using Anthropic
         self.lm = dspy.LM(
