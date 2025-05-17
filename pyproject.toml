@@ -23,6 +23,7 @@ pyright = "^1.1.350"
 
 [tool.poetry.scripts]
 dspy-prompt-optimizer = "prompt_optimizer.cli:main"
+dspy-prompt-history = "prompt_optimizer.cli:history_command"
 
 [build-system]
 requires = ["poetry-core"]

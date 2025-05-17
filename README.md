@@ -13,6 +13,7 @@ Claude Sonnet 3.7.
 - [Understanding DSPy Concepts](#understanding-dspy-concepts)
 - [Optimization Approaches](#optimization-approaches)
 - [Example Workflow](#example-workflow)
+- [History](#history)
 - [Build and Packaging](#build-and-packaging)
 - [Development Setup](#development-setup)
 - [Troubleshooting](#troubleshooting)
@@ -354,11 +355,25 @@ Here's a typical workflow for optimizing a prompt for Claude Sonnet 3.7:
 4. Review the optimized prompt in `optimized_prompt.txt`
 
 5. Try different optimization approaches to compare results:
-   ````bash
+   ```bash
    poetry run dspy-prompt-optimizer original_prompt.txt -o optimized_self.txt -t self -v
    poetry run dspy-prompt-optimizer original_prompt.txt -o optimized_example.txt -t example -v
-   poetry run dspy-prompt-optimizer original_prom   ```
-   ````
+   ```
+
+## History
+
+The optimizer records each successful run to `~/.dspy_prompt_optimizer/history.log`.
+View the most recent entries:
+
+```bash
+dspy-prompt-optimizer history --limit 5
+```
+
+Clear the log with:
+
+```bash
+dspy-prompt-optimizer history --clear
+```
 
 ## Build and Packaging
 
@@ -434,7 +449,7 @@ Potential improvements for future versions:
 - Batch processing of multiple prompts
 - Fine-tuning optimization parameters
 - Additional optimization approaches
-- Persistent storage of optimization history
+- Improved visualization of optimization history
 
 This project was created to demonstrate DSPy's capabilities for prompt
 optimization. For more information about DSPy, visit the
