@@ -21,8 +21,8 @@ from .optimizer import optimize_prompt
 @click.option(
     "--model",
     "-m",
-    default="claude-3-7-sonnet-latest",
-    help="Model to use for optimization. Defaults to claude-3-7-sonnet-latest.",
+    default="claude-sonnet-4-20250514",
+    help="Model to use for optimization. Defaults to claude-sonnet-4-20250514.",
 )
 @click.option(
     "--api-key",

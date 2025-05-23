@@ -8,9 +8,8 @@ packages = [{include = "prompt_optimizer"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-dspy-ai = "^2.6.24"
-click = "^8.2.1"
-anthropic = "^0.52.0"
+dspy-ai = "2.6.24"
+click = "8.2.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"

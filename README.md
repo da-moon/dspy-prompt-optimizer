@@ -158,7 +158,7 @@ poetry run dspy-prompt-optimizer your_prompt.txt -v
 - `INPUT_PROMPT`: File containing the prompt to optimize (defaults to stdin)
 - `--output, -o`: Output file for the optimized prompt (defaults to stdout)
 - `--model, -m`: Model to use for optimization (defaults to
-  claude-3-7-sonnet-latest)
+  claude-sonnet-4-20250514)
 - `--api-key, -k`: Anthropic API key (can also be set via ANTHROPIC_API_KEY
   environment variable)
 - `--optimization-type, -t`: Type of optimization to perform: self, example, or
@@ -283,7 +283,7 @@ DSPy abstracts away the specifics of different LM providers, making it easy to
 switch between them:
 
 ```python
-lm = dspy.LM('anthropic/claude-3-7-sonnet-latest', api_key="your-api-key")
+lm = dspy.LM('anthropic/claude-sonnet-4-20250514', api_key="your-api-key")
 dspy.configure(lm=lm)
 ```
 
