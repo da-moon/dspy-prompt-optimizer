@@ -56,7 +56,7 @@ def mock_dspy(monkeypatch: Any) -> None:
     def mock_configure(**_kwargs: Any) -> None:
         return None
 
-    def mock_lm(**_kwargs: Any) -> None:
+    def mock_lm(*_args: Any, **_kwargs: Any) -> None:
         return None
 
     fake_dspy = SimpleNamespace(
@@ -78,20 +78,20 @@ def mock_dspy(monkeypatch: Any) -> None:
 
 
 def test_self_refinement_optimizer(mock_dspy: Any) -> None:
-    opt = SelfRefinementOptimizer(model="m", api_key="k")
+    opt = SelfRefinementOptimizer(model="m", api_key="k", max_tokens=64000)
     result = opt.optimize("prompt")
     assert result == "improved"
 
 
 def test_example_based_optimizer(mock_dspy: Any) -> None:
-    opt = ExampleBasedOptimizer(model="m", api_key="k")
+    opt = ExampleBasedOptimizer(model="m", api_key="k", max_tokens=64000)
     result = opt.optimize("prompt")
     assert result == "improved"
 
 
 def test_example_based_optimizer_dspy_compatibility(mock_dspy: Any) -> None:
     """Test that example-based optimizer doesn't use non-existent DSPy methods."""
-    opt = ExampleBasedOptimizer(model="m", api_key="k")
+    opt = ExampleBasedOptimizer(model="m", api_key="k", max_tokens=64000)
 
     # This should not raise AttributeError about 'update_demos'
     # If the old code with update_demos was still there, this would fail
@@ -104,13 +104,15 @@ def test_example_based_optimizer_dspy_compatibility(mock_dspy: Any) -> None:
 
 
 def test_metric_based_optimizer(mock_dspy: Any) -> None:
-    opt = MetricBasedOptimizer(model="m", api_key="k")
+    opt = MetricBasedOptimizer(model="m", api_key="k", max_tokens=64000)
     result = opt.optimize("prompt")
     assert result == "improved"
 
 
 def test_metric_based_optimizer_with_custom_iterations(mock_dspy: Any) -> None:
-    opt = MetricBasedOptimizer(model="m", api_key="k", max_iterations=5)
+    opt = MetricBasedOptimizer(
+        model="m", api_key="k", max_iterations=5, max_tokens=64000
+    )
     assert opt.max_iterations == 5
     result = opt.optimize("prompt")
     assert result == "improved"
@@ -119,29 +121,44 @@ def test_metric_based_optimizer_with_custom_iterations(mock_dspy: Any) -> None:
 def test_optimize_prompt_function(mock_dspy: Any) -> None:
     """Test the convenience function for each optimization type."""
     # Test self-refinement (default)
-    result = optimize_prompt("test prompt", "model", "api_key")
+    result = optimize_prompt(
+        prompt_text="test prompt", model="model", api_key="api_key"
+    )
     assert result == "improved"
 
     # Test example-based
     result = optimize_prompt(
-        "test prompt", "model", "api_key", optimization_type="example"
+        prompt_text="test prompt",
+        model="model",
+        api_key="api_key",
+        optimization_type="example",
     )
     assert result == "improved"
 
     # Test metric-based
     result = optimize_prompt(
-        "test prompt", "model", "api_key", optimization_type="metric"
+        prompt_text="test prompt",
+        model="model",
+        api_key="api_key",
+        optimization_type="metric",
     )
     assert result == "improved"
 
     # Test metric-based with custom max_iterations
     result = optimize_prompt(
-        "test prompt", "model", "api_key", optimization_type="metric", max_iterations=5
+        prompt_text="test prompt",
+        model="model",
+        api_key="api_key",
+        optimization_type="metric",
+        max_iterations=5,
     )
     assert result == "improved"
 
     # Test invalid optimization type
     with pytest.raises(ValueError, match="Unknown optimization type"):
         _ = optimize_prompt(
-            "test prompt", "model", "api_key", optimization_type="invalid"
+            prompt_text="test prompt",
+            model="model",
+            api_key="api_key",
+            optimization_type="invalid",
         )

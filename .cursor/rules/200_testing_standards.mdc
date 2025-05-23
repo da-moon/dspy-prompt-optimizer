@@ -1,0 +1,64 @@
+---
+description: Testing standards and pytest patterns for comprehensive coverage
+globs: "tests/**/*.py"
+alwaysApply: false
+---
+
+# Testing Standards
+
+## Test Structure and Organization
+```python
+import pytest
+from unittest.mock import Mock, patch
+
+class TestPaymentProcessor:
+    """Test suite for PaymentProcessor."""
+
+    @pytest.fixture
+    def processor(self) -> PaymentProcessor:
+        """Create processor with mock gateway."""
+        gateway = Mock(spec=PaymentGateway)
+        return PaymentProcessor(gateway)
+
+    def test_process_payment_success(self, processor: PaymentProcessor) -> None:
+        """Test successful payment processing."""
+        # Arrange
+        amount = Decimal("100.00")
+        token = "valid_token"
+
+        # Act
+        result = processor.process_payment(amount, token)
+
+        # Assert
+        assert result.success is True
+        assert result.transaction_id is not None
+```
+
+## Test Naming Conventions
+- Class names: `TestClassName`
+- Method names: `test_method_name_condition_expected_result`
+- Use descriptive test names that explain the scenario
+- Group related tests in classes
+
+## Arrange-Act-Assert Pattern
+- **Arrange**: Set up test data and mocks
+- **Act**: Execute the code under test
+- **Assert**: Verify the expected outcomes
+
+## Fixture Guidelines
+- Use fixtures for common test setup
+- Keep fixtures focused and reusable
+- Use `pytest.fixture` with appropriate scope
+- Mock external dependencies
+
+## Assertion Best Practices
+- Use specific assertions (`assert x is True` not `assert x`)
+- Test one concept per test method
+- Include meaningful assertion messages when helpful
+- Verify both positive and negative cases
+
+## Test Coverage Requirements
+- Aim for >90% code coverage
+- Test edge cases and error conditions
+- Mock external services and dependencies
+- Include integration tests for critical paths

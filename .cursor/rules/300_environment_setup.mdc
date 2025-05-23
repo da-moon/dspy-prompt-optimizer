@@ -1,0 +1,73 @@
+---
+description: Environment setup and essential development commands
+alwaysApply: true
+---
+
+# Environment Setup & Commands
+
+## Environment Activation
+```bash
+# Activate Python environment
+poetry shell
+
+# Install dependencies
+poetry install
+
+# Run the application
+poetry run python main.py
+```
+
+## Essential Quality Commands (Run in Order)
+```bash
+# Type checking & linting (MANDATORY ORDER)
+poetry run pyright --project pyrightconfig.strict.json .
+poetry run mypy .
+poetry run pylint .
+poetry run sourcery review --verbose --no-summary . | cat
+
+# Testing
+poetry run pytest
+poetry run pytest -xvs  # Stop on first failure with verbose output
+
+# Code formatting
+poetry run black .
+poetry run isort .
+```
+
+## Development Workflow Commands
+```bash
+# Pre-commit hooks
+pre-commit install
+pre-commit run --all-files
+
+# Build & Deploy
+poetry build
+poetry publish --dry-run
+```
+
+## Debugging and Profiling
+```bash
+# Run with debugger
+poetry run python -m pdb main.py
+
+# Profile performance
+poetry run python -m cProfile -o profile.stats main.py
+
+# Memory profiling
+poetry run python -m memory_profiler main.py
+```
+
+## Documentation
+```bash
+# Generate docs
+poetry run sphinx-build -b html docs docs/_build
+
+# Serve docs locally
+poetry run python -m http.server --directory docs/_build
+```
+
+## Command Execution Rules
+- Always run linters in the specified order
+- Fix all issues before proceeding to next tool
+- Re-run linters after fixes to ensure no regressions
+- Provide summary of fixes for each tool

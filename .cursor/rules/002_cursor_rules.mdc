@@ -1,0 +1,42 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Cursor Rules Management
+
+## Rule Organization
+- Use numbered prefixes: `001_`, `002_`, etc. for load order
+  - `001-099`: Core workspace rules (alwaysApply: true)
+  - `100-199`: Python development rules
+  - `200-299`: Testing and quality rules
+  - `300-399`: Tooling and environment rules
+  - `400-499`: Architecture and organization rules
+
+## File Format Requirements
+```yaml
+---
+description: Clear, concise description under 120 characters
+globs: "**/*.py"  # or appropriate file patterns
+alwaysApply: false  # true only for core workspace rules
+---
+```
+
+## Rule Content Guidelines
+- Keep rules atomic and focused on single concerns
+- Maximum 500 lines per rule (target much less)
+- Use concrete examples and anti-patterns
+- Write actionable, testable requirements
+- Avoid vague guidance - be specific
+
+## Creating New Rules
+1. Use `/Generate Cursor Rules` command after defining behavior in chat
+2. Follow the numbering convention
+3. Include appropriate globs for file targeting
+4. Test rule effectiveness with AI interactions
+5. Keep descriptions machine-readable for AI agent selection
+
+## Rule Types
+- **Always**: `alwaysApply: true` - included in all contexts
+- **Auto Attached**: `globs` patterns - triggered by matching files
+- **Agent Requested**: `description` provided - AI decides when to use

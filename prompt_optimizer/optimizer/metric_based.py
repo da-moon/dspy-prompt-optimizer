@@ -2,8 +2,10 @@
 Metric-based prompt optimizer.
 """
 
-import dspy
 import logging
+
+import dspy
+
 from .base import PromptOptimizer
 
 logger = logging.getLogger(__name__)
@@ -24,7 +26,8 @@ class MetricBasedOptimizer(PromptOptimizer):
         """
         if self.verbose:
             logger.info(
-                f"Using metric-based optimization approach with {self.max_iterations} max iterations"
+                "Using metric-based optimization with %s max iterations",
+                self.max_iterations,
             )
 
         # Define a signature for prompt generation
@@ -58,24 +61,24 @@ class MetricBasedOptimizer(PromptOptimizer):
         for i in range(self.max_iterations):
             if i == 0:
                 # Evaluate the original prompt
-                evaluation: dspy.DSPyResult = evaluator(prompt=best_prompt)
+                evaluation = evaluator(prompt=best_prompt)
                 best_score = int(evaluation.total_score)
 
                 if self.verbose:
-                    logger.info(f"Original prompt score: {best_score}")
-                    logger.info(f"Feedback: {evaluation.feedback}")
+                    logger.info("Original prompt score: %s", best_score)
+                    logger.info("Feedback: %s", evaluation.feedback)
 
             # Generate an improved prompt
-            result: dspy.DSPyResult = generator(original_prompt=best_prompt)
+            result = generator(original_prompt=best_prompt)
             candidate_prompt: str = result.improved_prompt
 
             # Evaluate the candidate prompt
-            candidate_evaluation: dspy.DSPyResult = evaluator(prompt=candidate_prompt)
+            candidate_evaluation = evaluator(prompt=candidate_prompt)
             candidate_score: int = int(candidate_evaluation.total_score)
 
             if self.verbose:
-                logger.info(f"Iteration {i+1} score: {candidate_score}")
-                logger.info(f"Feedback: {candidate_evaluation.feedback}")
+                logger.info("Iteration %s score: %s", i + 1, candidate_score)
+                logger.info("Feedback: %s", candidate_evaluation.feedback)
 
             # Keep the better prompt
             if candidate_score > best_score:
@@ -83,6 +86,6 @@ class MetricBasedOptimizer(PromptOptimizer):
                 best_score = candidate_score
 
                 if self.verbose:
-                    logger.info(f"Found better prompt with score: {best_score}")
+                    logger.info("Found better prompt with score: %s", best_score)
 
         return best_prompt

@@ -1,0 +1,45 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Python Coding Standards
+
+## Type Annotations (MANDATORY)
+- Variable annotations: `count: int = 0`
+- Function parameters: `def process(data: List[str]) -> None:`
+- Return types: Always annotate, use `-> None` for procedures
+- Class attributes: Annotate in `__init__`
+- Use `Final` for immutable attributes
+- Use `Optional[T]` or `T | None` for nullable types
+
+## Example
+```python
+from typing import List, Optional, Final
+from decimal import Decimal
+
+class OrderService:
+    def __init__(self, repository: OrderRepository) -> None:
+        self._repository: Final[OrderRepository] = repository
+        self._validators: List[Callable[[Order], bool]] = []
+
+    def find_order(self, order_id: str) -> Optional[Order]:
+        """Find order by ID, returns None if not found."""
+        if not isinstance(order_id, str):
+            raise TypeError(f"Expected str, got {type(order_id)}")
+
+        result = self._repository.get(order_id)
+        return result if result is not None else None
+```
+
+## Forbidden Practices
+- ❌ NEVER use `# type: ignore` comments
+- ❌ NEVER skip type annotations
+- ❌ NEVER add pylint disable comments without justification
+- ❌ NEVER use `Any` type without strong justification
+
+## Quality Requirements
+- All code must pass pyright strict mode
+- All code must pass mypy without errors
+- Follow PEP 8 style guidelines
+- Use meaningful variable and function names

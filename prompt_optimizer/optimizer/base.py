@@ -9,7 +9,8 @@ import dspy
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ class PromptOptimizer:
     api_key: str
     verbose: bool = False
     max_iterations: int = field(default=3, kw_only=True)
+    max_tokens: int = field(default=64000, kw_only=True)
     lm: dspy.LM = field(init=False)
 
     def __post_init__(self) -> None:
@@ -31,14 +33,23 @@ class PromptOptimizer:
 
     def _setup_dspy(self) -> None:
         """Set up DSPy with the Anthropic model."""
-        # Configure the LM using Anthropic
-        self.lm = dspy.LM(model=self.model, provider="anthropic", api_key=self.api_key)
+        # Configure the LM using Anthropic with custom max_tokens
+        self.lm = dspy.LM(
+            self.model,
+            provider="anthropic",
+            api_key=self.api_key,
+            max_tokens=self.max_tokens,
+        )
 
         # Set the LM as the default for DSPy
         dspy.configure(lm=self.lm)
 
         if self.verbose:
-            logger.info(f"DSPy configured with model: {self.model}")
+            logger.info(
+                "DSPy configured with model: %s (max_tokens=%d)",
+                self.model,
+                self.max_tokens,
+            )
 
     def optimize(self, prompt_text: str) -> str:
         """

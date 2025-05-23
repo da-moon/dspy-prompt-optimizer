@@ -1,0 +1,59 @@
+---
+description: Logging standards and practices for consistent output
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Logging Standards
+
+## Logger Configuration
+```python
+from loguru import logger
+
+# Configure at module level
+logger = logger.bind(module=__name__)
+```
+
+## Logging in Classes
+```python
+class DataProcessor:
+    def process(self, items: List[Item]) -> None:
+        logger.info(f"Starting processing of {len(items)} items")
+
+        for i, item in enumerate(items):
+            logger.trace(f"Processing item {i}: {item.id}")
+            try:
+                self._process_item(item)
+            except Exception as e:
+                logger.error(f"Failed to process item {item.id}: {e}")
+                raise
+
+        logger.info("Processing completed successfully")
+```
+
+## Log Levels and Usage
+- **TRACE**: Very detailed debugging information
+- **DEBUG**: Detailed debugging for development
+- **INFO**: General information about program flow
+- **WARNING**: Something unexpected but not error
+- **ERROR**: Error occurred but program continues
+- **CRITICAL**: Serious error, program may abort
+
+## Log Message Guidelines
+- Include relevant context (IDs, counts, values)
+- Use structured logging when possible
+- Include timing information for performance operations
+- Log both start and completion of significant operations
+- Include error details with stack traces for exceptions
+
+## Performance Considerations
+- Use lazy evaluation for expensive log message construction
+- Consider log level before constructing complex messages
+- Avoid logging in tight loops unless necessary
+- Use sampling for high-frequency events
+
+## Security and Privacy
+- Never log sensitive data (passwords, tokens, PII)
+- Sanitize user input before logging
+- Use placeholder values for sensitive fields
+- Be careful with file paths and system information

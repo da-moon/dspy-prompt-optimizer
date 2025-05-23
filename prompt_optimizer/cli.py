@@ -3,8 +3,9 @@ Command-line interface for DSPy Prompt Optimizer.
 """
 
 import sys
-import click
 from typing import Optional, TextIO
+
+import click
 
 from .optimizer import optimize_prompt
 
@@ -28,14 +29,14 @@ from .optimizer import optimize_prompt
     "--api-key",
     "-k",
     envvar="ANTHROPIC_API_KEY",
-    help="Anthropic API key. Can also be set via ANTHROPIC_API_KEY environment variable.",
+    help="Anthropic API key. Can also be set via ANTHROPIC_API_KEY env variable.",
 )
 @click.option(
     "--optimization-type",
     "-t",
     type=click.Choice(["self", "example", "metric"]),
     default="self",
-    help="Type of optimization to perform: self-refinement, example-based, or metric-based.",
+    help="Type of optimization: self-refinement, example-based, or metric-based.",
 )
 @click.option(
     "--max-iterations",
@@ -44,14 +45,22 @@ from .optimizer import optimize_prompt
     default=3,
     help="Maximum number of iterations for metric-based optimization. Defaults to 3.",
 )
+@click.option(
+    "--max-tokens",
+    type=int,
+    default=64000,
+    help="Maximum number of tokens for LM generation. Defaults to 64000.",
+)
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose output.")
 def main(
     input_prompt: TextIO,
     output: TextIO,
+    *,
     model: str,
     api_key: Optional[str],
     optimization_type: str,
     max_iterations: int,
+    max_tokens: int,
     verbose: bool,
 ) -> None:
     """
@@ -71,7 +80,7 @@ def main(
 
     if verbose:
         click.echo(
-            f"Optimizing prompt using {optimization_type} approach with model {model}...",
+            f"Optimizing prompt using {optimization_type} approach with model {model} (max_tokens={max_tokens})...",
             err=True,
         )
 
@@ -83,6 +92,7 @@ def main(
             api_key=api_key,
             optimization_type=optimization_type,
             max_iterations=max_iterations,
+            max_tokens=max_tokens,
             verbose=verbose,
         )
 
@@ -92,10 +102,10 @@ def main(
         if verbose:
             click.echo("Prompt optimization complete!", err=True)
 
-    except Exception as e:
+    except (ValueError, RuntimeError, KeyError) as e:
         click.echo(f"Error during prompt optimization: {str(e)}", err=True)
         sys.exit(1)
 
 
 if __name__ == "__main__":
-    main()
+    main()  # pylint: disable=missing-kwoa,no-value-for-parameter

@@ -1,6 +1,6 @@
 """Minimal type stubs for dspy library - precisely typed based on actual usage."""
 
-from typing import List, Type, Protocol, runtime_checkable
+from typing import Type, Protocol, runtime_checkable
 from pydantic.fields import FieldInfo
 
 # Protocol for DSPy result objects that have dynamic attributes
@@ -52,6 +52,7 @@ class LM:
         model: str,
         provider: str,
         api_key: str,
+        max_tokens: int = ...,
     ) -> None: ...
 
 # Predict and ChainOfThought - based on our actual usage patterns
@@ -64,7 +65,11 @@ class Predict:
 class ChainOfThought:
     def __init__(self, signature: Type[Signature]) -> None: ...
     def __call__(
-        self, *, prompt: str = ..., original_prompt: str = ..., examples: str = ...
+        self,
+        *,
+        prompt: str = ...,
+        original_prompt: str = ...,
+        examples: str = ...,
     ) -> DSPyResult: ...
 
 # Module-level configure function - only what we use

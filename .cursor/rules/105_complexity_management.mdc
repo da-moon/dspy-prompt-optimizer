@@ -1,0 +1,58 @@
+---
+description: Code complexity management and readability patterns
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Complexity Management
+
+## Cyclomatic Complexity Guidelines
+- Methods should have cyclomatic complexity ≤ 10
+- Break complex logic into smaller methods
+- Use early returns to reduce nesting
+- Prefer guard clauses over deeply nested conditions
+
+## Reducing Complexity - Before/After
+
+### ❌ High Complexity Example
+```python
+def process_order(order: Order) -> Result:
+    if order.status == "pending":
+        if order.payment_status == "paid":
+            if order.items:
+                for item in order.items:
+                    if item.in_stock:
+                        # Process...
+```
+
+### ✅ Low Complexity Example
+```python
+def process_order(order: Order) -> Result:
+    if not self._is_processable(order):
+        return Result.failure("Order not processable")
+
+    return self._process_items(order.items)
+
+def _is_processable(self, order: Order) -> bool:
+    return (order.status == "pending" and
+            order.payment_status == "paid" and
+            bool(order.items))
+```
+
+## Function Length Guidelines
+- Keep functions under 25 lines when possible
+- Extract helper methods for complex operations
+- Use descriptive function names that explain intent
+- One level of abstraction per function
+
+## Readability Techniques
+- Use meaningful variable names
+- Extract magic numbers into named constants
+- Group related operations into helper methods
+- Add comments for non-obvious business logic
+
+## Complexity Reduction Strategies
+- **Extract Method**: Break large functions into smaller ones
+- **Extract Variable**: Give complex expressions meaningful names
+- **Guard Clauses**: Return early to reduce nesting
+- **Strategy Pattern**: Replace complex conditionals with polymorphism

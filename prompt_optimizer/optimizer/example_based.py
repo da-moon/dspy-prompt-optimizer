@@ -47,13 +47,33 @@ class ExampleBasedOptimizer(PromptOptimizer):
         examples: List[dspy.Example] = [
             dspy.Example(
                 prompt="Tell me about climate change",
-                analysis="This prompt is too vague and doesn't specify what aspects of climate change to focus on or what depth of information is needed.",
-                improved_prompt="Provide a comprehensive explanation of the primary causes of climate change, focusing on both natural and anthropogenic factors. Include recent scientific consensus on the rate of global warming and its projected impacts on ecosystems over the next 50 years.",
+                analysis=(
+                    "This prompt is too vague and doesn't specify what aspects "
+                    "of climate change to focus on or what depth of information "
+                    "is needed."
+                ),
+                improved_prompt=(
+                    "Provide a comprehensive explanation of the primary causes of "
+                    "climate change, focusing on both natural and anthropogenic "
+                    "factors. Include recent scientific consensus on the rate of "
+                    "global warming and its projected impacts on ecosystems over "
+                    "the next 50 years."
+                ),
             ),
             dspy.Example(
                 prompt="How do I make a website?",
-                analysis="This prompt lacks specificity about the type of website, the user's skill level, or what technologies they're interested in using.",
-                improved_prompt="I'm a beginner with basic HTML/CSS knowledge looking to create a personal portfolio website. Please provide a step-by-step guide on how to build a responsive portfolio site, including recommended frameworks, hosting options, and essential features for showcasing my work effectively.",
+                analysis=(
+                    "This prompt lacks specificity about the type of website, "
+                    "the user's skill level, or what technologies they're "
+                    "interested in using."
+                ),
+                improved_prompt=(
+                    "I'm a beginner with basic HTML/CSS knowledge looking to "
+                    "create a personal portfolio website. Please provide a "
+                    "step-by-step guide on how to build a responsive portfolio "
+                    "site, including recommended frameworks, hosting options, "
+                    "and essential features for showcasing my work effectively."
+                ),
             ),
         ]
 
@@ -71,11 +91,9 @@ class ExampleBasedOptimizer(PromptOptimizer):
         refiner: dspy.ChainOfThought = dspy.ChainOfThought(ExamplePromptRefiner)
 
         # Apply the module with examples as context to refine the prompt
-        refinement_payload: dspy.DSPyResult = refiner(
-            prompt=prompt_text, examples=examples_text
-        )
+        refinement_payload = refiner(prompt=prompt_text, examples=examples_text)
 
         if self.verbose:
-            logger.info(f"Analysis: {refinement_payload.analysis}")
+            logger.info("Analysis: %s", refinement_payload.analysis)
 
         return refinement_payload.improved_prompt

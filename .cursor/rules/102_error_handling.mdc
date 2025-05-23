@@ -1,0 +1,66 @@
+---
+description: Error handling and exception management patterns
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Error Handling & Exception Management
+
+## Comprehensive Error Handling Pattern
+```python
+def process_data(data: Any) -> ProcessedData:
+    """Process input data with full validation."""
+    # Input validation - fail fast
+    if data is None:
+        raise ValueError("Data cannot be None")
+
+    if not isinstance(data, (dict, list)):
+        raise TypeError(f"Expected dict or list, got {type(data)}")
+
+    try:
+        # Processing logic
+        result = transform_data(data)
+        logger.info(f"Successfully processed {len(data)} items")
+        return result
+
+    except ValidationError as e:
+        logger.error(f"Validation failed: {e}")
+        raise  # Re-raise with context
+
+    except Exception as e:
+        logger.error(f"Unexpected error in process_data: {e}")
+        raise RuntimeError(f"Processing failed: {e}") from e
+```
+
+## Exception Hierarchy
+- Create custom exception classes for domain-specific errors
+- Inherit from appropriate built-in exceptions
+- Use exception chaining with `raise ... from e`
+- Include meaningful error messages with context
+
+## Error Handling Guidelines
+- **Fail Fast**: Validate inputs immediately
+- **Be Specific**: Catch specific exceptions, not bare `except:`
+- **Log Appropriately**: Log errors with sufficient context
+- **Clean Resources**: Use `try/finally` or context managers
+- **Re-raise When Needed**: Don't swallow exceptions silently
+
+## Context Managers for Resource Management
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def managed_resource():
+    resource = acquire_resource()
+    try:
+        yield resource
+    finally:
+        release_resource(resource)
+```
+
+## Anti-Patterns to Avoid
+- ❌ Bare `except:` clauses
+- ❌ Silent exception swallowing
+- ❌ Generic exception messages
+- ❌ Not cleaning up resources
+- ❌ Catching and not re-raising when you can't handle

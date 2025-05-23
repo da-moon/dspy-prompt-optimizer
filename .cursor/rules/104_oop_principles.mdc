@@ -1,0 +1,57 @@
+---
+description: Object-oriented programming principles and class design patterns
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Object-Oriented Programming Principles
+
+## Single Responsibility Principle (SRP)
+- Each class/module has ONE reason to change
+- Each method has a clear, singular purpose
+- Files organized by feature, not technical layer
+
+## Encapsulated Class Design
+```python
+class PaymentProcessor:
+    """Handles payment processing logic."""
+
+    def __init__(self, gateway: PaymentGateway) -> None:
+        self._gateway: Final[PaymentGateway] = gateway
+        self._logger: Final[Logger] = get_logger(__name__)
+
+    def process_payment(self, amount: Decimal, token: str) -> PaymentResult:
+        """Process a single payment transaction."""
+        self._validate_amount(amount)
+        self._validate_token(token)
+        # Implementation...
+
+    def _validate_amount(self, amount: Decimal) -> None:
+        """Private method for amount validation."""
+        if amount <= 0:
+            raise ValueError("Amount must be positive")
+```
+
+## Composition Over Inheritance
+- Favor composition for code reuse
+- Use inheritance only for true "is-a" relationships
+- Keep inheritance hierarchies shallow (2-3 levels max)
+- Use abstract base classes to define interfaces
+
+## Class Attribute Guidelines
+- Use `Final` for immutable attributes
+- Mark private attributes with leading underscore
+- Initialize all attributes in `__init__`
+- Avoid class variables unless truly shared
+
+## Method Design Principles
+- Keep methods small and focused (< 20 lines preferred)
+- Use clear, descriptive method names
+- Return meaningful values or None
+- Avoid side effects in pure functions
+
+## Interface Design
+- Define clear public APIs
+- Use protocols for structural typing
+- Keep interfaces minimal and cohesive
+- Document expected behavior in docstrings

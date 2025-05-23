@@ -20,6 +20,7 @@ pytest = "^8.3.5"
 pytest-cov = "^6.1.1"
 pyright = "^1.1.401"
 poetry-plugin-up = "^0.9.0"
+sourcery = "^1.37.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -53,12 +54,73 @@ use_parentheses = true
 ensure_newline_before_comments = true
 line_length = 88
 
+[tool.pylint.MASTER]
+extension-pkg-whitelist = []
+ignore = ["CVS"]
+ignore-patterns = []
+load-plugins = []
+persistent = true
+suggestion-mode = true
+unsafe-load-any-extension = false
+
+[tool.pylint."MESSAGES CONTROL"]
+confidence = []
+disable = [
+    "missing-module-docstring",
+    "too-many-arguments",
+    "too-many-locals",
+    "too-many-branches",
+    "too-many-statements",
+    "too-many-instance-attributes",
+    "duplicate-code",
+    "too-few-public-methods"
+]
+enable = ["c-extension-no-member"]
+
+[tool.pylint.FORMAT]
+expected-line-ending-format = ""
+ignore-long-lines = "^\\s*(# )?<?https?://\\S+>?$"
+indent-after-paren = 4
+indent-string = "    "
+max-line-length = 88
+max-module-lines = 1000
+single-line-class-stmt = false
+single-line-if-stmt = false
+
+[tool.pylint.BASIC]
+argument-naming-style = "snake_case"
+attr-naming-style = "snake_case"
+class-naming-style = "PascalCase"
+const-naming-style = "UPPER_CASE"
+function-naming-style = "snake_case"
+good-names = ["i", "j", "k", "ex", "Run", "_"]
+include-naming-hint = false
+method-naming-style = "snake_case"
+module-naming-style = "snake_case"
+variable-naming-style = "snake_case"
+
+[tool.pylint.VARIABLES]
+additional-builtins = []
+allow-global-unused-variables = true
+callbacks = ["cb_", "_cb"]
+dummy-variables-rgx = "_+$|(_[a-zA-Z0-9_]*[a-zA-Z0-9]+?$)|dummy|^ignored_|^unused_"
+ignored-argument-names = "_.*|^ignored_|^unused_"
+init-import = false
+redefining-builtins-modules = ["six.moves", "past.builtins", "future.builtins"]
+
+[tool.pylint.TYPECHECK]
+contextmanager-decorators = ["contextlib.contextmanager"]
+ignore-mixin-members = true
+ignore-on-opaque-inference = true
+ignored-classes = ["optparse.Values", "thread._local", "_thread._local"]
+
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
 
 [tool.mypy]
 python_version = "3.10"
+mypy_path = "typings"
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 check_untyped_defs = true
@@ -70,6 +132,10 @@ warn_unused_ignores = true
 warn_no_return = true
 warn_return_any = true
 warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = "dspy"
+ignore_missing_imports = false
 
 [tool.pytest.ini_options]
 addopts = "-vv"

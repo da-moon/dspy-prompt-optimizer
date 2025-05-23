@@ -149,6 +149,9 @@ poetry run dspy-prompt-optimizer your_prompt.txt -t example
 # Use metric-based optimization with custom iterations
 poetry run dspy-prompt-optimizer your_prompt.txt -t metric -i 5
 
+# Configure maximum tokens for longer responses
+poetry run dspy-prompt-optimizer your_prompt.txt --max-tokens 128000
+
 # Enable verbose output
 poetry run dspy-prompt-optimizer your_prompt.txt -v
 ```
@@ -165,6 +168,7 @@ poetry run dspy-prompt-optimizer your_prompt.txt -v
   metric (defaults to self)
 - `--max-iterations, -i`: Maximum number of iterations for metric-based
   optimization (defaults to 3)
+- `--max-tokens`: Maximum number of tokens for LM generation (defaults to 64000)
 - `--verbose, -v`: Enable verbose output
 
 ## Using Poetry Commands
@@ -448,6 +452,21 @@ If you encounter issues with Poetry:
   project root directory
 - **Version conflicts**: Check your `pyproject.toml` file for dependency
   version constraints
+
+### Token Limit Issues
+
+If you encounter errors related to token limits:
+
+- **Error message**: "LM response was truncated due to exceeding max_tokens=4000"
+
+- **Solution**: Use the `--max-tokens` flag to increase the token limit:
+  ```bash
+  poetry run dspy-prompt-optimizer your_prompt.txt --max-tokens 128000
+  ```
+
+- **Default value**: The default is 64000 tokens, which should handle most use cases
+- **Considerations**: Higher token limits may increase response time and API costs
+- **For complex prompts**: Use higher values like 128000 or 256000 tokens
 
 ### Dependency Issues
 

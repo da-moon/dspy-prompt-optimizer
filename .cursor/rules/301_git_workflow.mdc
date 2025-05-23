@@ -1,0 +1,57 @@
+---
+description: Git workflow and version control best practices
+alwaysApply: true
+---
+
+# Git Workflow & Version Control
+
+## Branch Strategy
+```bash
+# Feature development
+git checkout -b feature/description
+# Make changes, then run all linters
+# Commit only after all checks pass
+git commit -m "type(scope): description"  # conventional commits
+```
+
+## Conventional Commits Format
+- `feat(scope): add new feature`
+- `fix(scope): fix bug in component`
+- `docs(scope): update documentation`
+- `style(scope): format code, no logic change`
+- `refactor(scope): restructure code without changing behavior`
+- `test(scope): add or update tests`
+- `chore(scope): update build scripts, dependencies`
+
+## Pre-Commit Requirements
+- All linters must pass (pyright, mypy, pylint, sourcery)
+- All tests must pass
+- Code must be formatted (black, isort)
+- No merge conflicts
+- Conventional commit message format
+
+## Working with Issues
+```bash
+# Use /project:fix-github-issue <issue_number> command
+# Reference issues in commit messages: "fix(api): resolve #123"
+```
+
+## Branch Management
+- Keep feature branches small and focused
+- Rebase feature branches before merging
+- Delete merged branches
+- Use descriptive branch names
+- Avoid long-lived feature branches
+
+## Code Review Guidelines
+- Review for code quality, not just functionality
+- Check type annotations and error handling
+- Verify tests cover new functionality
+- Ensure documentation is updated
+- Confirm linting rules are followed
+
+## Release Process
+- Use semantic versioning (MAJOR.MINOR.PATCH)
+- Tag releases with version numbers
+- Update CHANGELOG.md for each release
+- Ensure all tests pass before release

@@ -1,0 +1,72 @@
+---
+description: Code organization and package structure guidelines
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Code Organization & Package Structure
+
+## Project Structure
+```
+project/
+├── src/
+│   └── myproject/
+│       ├── __init__.py
+│       ├── core/           # Core business logic
+│       │   ├── __init__.py
+│       │   ├── models.py   # Domain models
+│       │   └── services.py # Business services
+│       ├── api/            # API layer
+│       │   ├── __init__.py
+│       │   └── routes.py
+│       └── utils/          # Shared utilities
+│           ├── __init__.py
+│           └── helpers.py
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   └── conftest.py
+├── pyproject.toml
+└── README.md
+```
+
+## Module Organization Principles
+- **Package-by-Feature**: Group related functionality together
+- **Layered Architecture**: Clear separation between layers
+- **Component-Based**: Reusable, self-contained components
+
+## Import Guidelines
+```python
+# Standard library imports first
+import os
+import sys
+from typing import List, Optional
+
+# Third-party imports second
+import click
+import requests
+from pydantic import BaseModel
+
+# Local imports last
+from prompt_optimizer.core import models
+from prompt_optimizer.utils import helpers
+```
+
+## File Naming Conventions
+- Use snake_case for file and directory names
+- Use descriptive names that indicate purpose
+- Keep filenames short but meaningful
+- Group related files in directories
+
+## Package Structure Rules
+- Each package must have `__init__.py`
+- Expose public API through `__init__.py`
+- Keep private modules internal to packages
+- Use relative imports within packages
+- Document package purpose in `__init__.py`
+
+## Dependency Management
+- Keep dependencies minimal and justified
+- Pin versions for reproducible builds
+- Separate dev dependencies from runtime
+- Regular dependency updates and security checks

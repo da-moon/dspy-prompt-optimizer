@@ -1,0 +1,52 @@
+---
+description: Type safety and validation patterns for robust code
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Type Safety & Validation
+
+## Input Validation - Fail Fast
+```python
+def process_data(data: Any) -> ProcessedData:
+    """Process input data with full validation."""
+    # Input validation - fail fast
+    if data is None:
+        raise ValueError("Data cannot be None")
+
+    if not isinstance(data, (dict, list)):
+        raise TypeError(f"Expected dict or list, got {type(data)}")
+```
+
+## Runtime Type Checking
+- Use `isinstance()` for runtime type validation
+- Validate function parameters at entry points
+- Check return values in critical functions
+- Use `assert` statements for development-time checks only
+
+## Type Guards and Narrowing
+```python
+from typing import TypeGuard
+
+def is_string_list(value: Any) -> TypeGuard[List[str]]:
+    """Type guard to check if value is List[str]."""
+    return (isinstance(value, list) and
+            all(isinstance(item, str) for item in value))
+
+def process_strings(data: Any) -> None:
+    if is_string_list(data):
+        # Type checker knows data is List[str] here
+        for item in data:
+            print(item.upper())  # No type error
+```
+
+## Generic Types and Protocols
+- Use generics for reusable components
+- Define protocols for structural typing
+- Prefer composition over inheritance for type safety
+
+## Advanced Type Patterns
+- Use `Literal` for restricted string/int values
+- Use `Union` types sparingly, prefer protocols
+- Use `NewType` for distinct semantic types
+- Use `overload` for functions with multiple signatures

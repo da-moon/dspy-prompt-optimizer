@@ -43,9 +43,9 @@ class SelfRefinementOptimizer(PromptOptimizer):
         refiner: dspy.Predict = dspy.Predict(PromptRefiner)
 
         # Apply the module to refine the prompt
-        result: dspy.DSPyResult = refiner(prompt=prompt_text)
+        result = refiner(prompt=prompt_text)
 
         if self.verbose:
-            logger.info(f"Analysis: {result.analysis}")
+            logger.info("Analysis: %s", result.analysis)
 
         return result.improved_prompt

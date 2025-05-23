@@ -1,0 +1,34 @@
+---
+description:
+globs: *.py
+alwaysApply: false
+---
+
+Execute the following Python linting tools in the specified order and resolve ALL identified issues:
+
+**Primary Linters (MUST fix all issues):**
+1. `poetry run pyright --project pyrightconfig.strict.json .`
+2. `poetry run mypy .`
+
+**Secondary Linters (fix when possible):**
+3. `poetry run pylint .`
+4. `poetry run sourcery review --verbose --no-summary . | cat`
+
+**Critical Requirements:**
+- **NEVER ignore** any issues reported by `pyright` or `mypy`
+- Fix ALL type checking errors, missing imports, undefined variables, and type annotations
+- Address `pylint` issues unless they conflict with type checker requirements
+- For `sourcery` suggestions: implement improvements where feasible, but these are optional
+
+**Execution Guidelines:**
+- Run linters in the exact order listed above
+- Fix issues from each linter before proceeding to the next
+- Re-run each linter after fixes to ensure no new issues were introduced
+- Provide a summary of what was fixed for each tool
+
+**Forbidden Actions:**
+- Using `# type: ignore` comments for mypy/pyright issues
+- Adding pylint disable comments without justification
+- Skipping type annotations or proper imports
+
+Complete all fixes and confirm clean linter output before finishing.
