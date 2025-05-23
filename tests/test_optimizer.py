@@ -2,12 +2,16 @@ from types import SimpleNamespace
 import pytest
 from typing import Any
 
-from prompt_optimizer.optimizer import SelfRefinementOptimizer, ExampleBasedOptimizer, MetricBasedOptimizer, optimize_prompt
+from prompt_optimizer.optimizer import (
+    SelfRefinementOptimizer,
+    ExampleBasedOptimizer,
+    MetricBasedOptimizer,
+    optimize_prompt,
+)
 import prompt_optimizer.optimizer.base as base_module
 import prompt_optimizer.optimizer.self_refinement as self_refinement_module
 import prompt_optimizer.optimizer.example_based as example_based_module
 import prompt_optimizer.optimizer.metric_based as metric_based_module
-
 
 
 @pytest.fixture
@@ -119,17 +123,25 @@ def test_optimize_prompt_function(mock_dspy: Any) -> None:
     assert result == "improved"
 
     # Test example-based
-    result = optimize_prompt("test prompt", "model", "api_key", optimization_type="example")
+    result = optimize_prompt(
+        "test prompt", "model", "api_key", optimization_type="example"
+    )
     assert result == "improved"
 
     # Test metric-based
-    result = optimize_prompt("test prompt", "model", "api_key", optimization_type="metric")
+    result = optimize_prompt(
+        "test prompt", "model", "api_key", optimization_type="metric"
+    )
     assert result == "improved"
 
     # Test metric-based with custom max_iterations
-    result = optimize_prompt("test prompt", "model", "api_key", optimization_type="metric", max_iterations=5)
+    result = optimize_prompt(
+        "test prompt", "model", "api_key", optimization_type="metric", max_iterations=5
+    )
     assert result == "improved"
 
     # Test invalid optimization type
     with pytest.raises(ValueError, match="Unknown optimization type"):
-        _ = optimize_prompt("test prompt", "model", "api_key", optimization_type="invalid")
+        _ = optimize_prompt(
+            "test prompt", "model", "api_key", optimization_type="invalid"
+        )

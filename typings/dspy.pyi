@@ -7,18 +7,16 @@ from pydantic.fields import FieldInfo
 @runtime_checkable
 class DSPyResult(Protocol):
     """Protocol for objects returned by DSPy predict/chain calls."""
+
     def __getattr__(self, name: str) -> str: ...
 
     # Explicit attributes that we know return strings
     @property
     def analysis(self) -> str: ...
-
     @property
     def improved_prompt(self) -> str: ...
-
     @property
     def total_score(self) -> str: ...
-
     @property
     def feedback(self) -> str: ...
 
@@ -29,28 +27,21 @@ def OutputField(*, desc: str) -> FieldInfo: ...
 # Base Signature class
 class SignatureMeta(type):
     """Metaclass for Signature to enable subclassing."""
+
     pass
 
 class Signature(metaclass=SignatureMeta):
     """Base class for DSPy signatures."""
+
     pass
 
 # Example class - only what we use, specific to our kwargs
 class Example:
-    def __init__(
-        self,
-        *,
-        prompt: str,
-        analysis: str,
-        improved_prompt: str
-    ) -> None: ...
-
+    def __init__(self, *, prompt: str, analysis: str, improved_prompt: str) -> None: ...
     @property
     def prompt(self) -> str: ...
-
     @property
     def analysis(self) -> str: ...
-
     @property
     def improved_prompt(self) -> str: ...
 
@@ -67,20 +58,13 @@ class LM:
 class Predict:
     def __init__(self, signature: Type[Signature]) -> None: ...
     def __call__(
-        self,
-        *,
-        prompt: str = ...,
-        original_prompt: str = ...
+        self, *, prompt: str = ..., original_prompt: str = ...
     ) -> DSPyResult: ...
 
 class ChainOfThought:
     def __init__(self, signature: Type[Signature]) -> None: ...
     def __call__(
-        self,
-        *,
-        prompt: str = ...,
-        original_prompt: str = ...,
-        examples: str = ...
+        self, *, prompt: str = ..., original_prompt: str = ..., examples: str = ...
     ) -> DSPyResult: ...
 
 # Module-level configure function - only what we use

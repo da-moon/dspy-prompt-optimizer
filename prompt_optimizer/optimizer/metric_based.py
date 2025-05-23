@@ -23,7 +23,9 @@ class MetricBasedOptimizer(PromptOptimizer):
             The optimized prompt text
         """
         if self.verbose:
-            logger.info(f"Using metric-based optimization approach with {self.max_iterations} max iterations")
+            logger.info(
+                f"Using metric-based optimization approach with {self.max_iterations} max iterations"
+            )
 
         # Define a signature for prompt generation
         class PromptGenerator(dspy.Signature):
@@ -39,7 +41,9 @@ class MetricBasedOptimizer(PromptOptimizer):
             prompt = dspy.InputField(desc="The prompt to evaluate")
             clarity_score = dspy.OutputField(desc="Score for clarity (1-10)")
             specificity_score = dspy.OutputField(desc="Score for specificity (1-10)")
-            actionability_score = dspy.OutputField(desc="Score for actionability (1-10)")
+            actionability_score = dspy.OutputField(
+                desc="Score for actionability (1-10)"
+            )
             total_score = dspy.OutputField(desc="Sum of all scores (3-30)")
             feedback = dspy.OutputField(desc="Feedback on how to improve the prompt")
 

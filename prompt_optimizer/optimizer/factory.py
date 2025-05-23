@@ -14,7 +14,7 @@ def optimize_prompt(
     api_key: str,
     optimization_type: str = "self",
     max_iterations: int = 3,
-    verbose: bool = False
+    verbose: bool = False,
 ) -> str:
     """
     Optimize a prompt using the specified optimization approach.
@@ -33,11 +33,15 @@ def optimize_prompt(
     optimizer: PromptOptimizer
     # Select the appropriate optimizer based on the optimization type
     if optimization_type == "self":
-        optimizer = SelfRefinementOptimizer(model=model, api_key=api_key, verbose=verbose)
+        optimizer = SelfRefinementOptimizer(
+            model=model, api_key=api_key, verbose=verbose
+        )
     elif optimization_type == "example":
         optimizer = ExampleBasedOptimizer(model=model, api_key=api_key, verbose=verbose)
     elif optimization_type == "metric":
-        optimizer = MetricBasedOptimizer(model=model, api_key=api_key, max_iterations=max_iterations, verbose=verbose)
+        optimizer = MetricBasedOptimizer(
+            model=model, api_key=api_key, max_iterations=max_iterations, verbose=verbose
+        )
     else:
         raise ValueError(f"Unknown optimization type: {optimization_type}")
 

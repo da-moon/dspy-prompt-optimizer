@@ -33,7 +33,9 @@ class ExampleBasedOptimizer(PromptOptimizer):
             """Refine a prompt based on examples of good prompts."""
 
             prompt = dspy.InputField(desc="The original prompt that needs refinement")
-            examples = dspy.InputField(desc="Examples of good prompt transformations to learn from")
+            examples = dspy.InputField(
+                desc="Examples of good prompt transformations to learn from"
+            )
             analysis = dspy.OutputField(
                 desc="Analysis of the prompt's strengths and weaknesses"
             )
@@ -56,20 +58,21 @@ class ExampleBasedOptimizer(PromptOptimizer):
         ]
 
         # Format examples as context text
-        examples_text = "\n\n".join([
-            f"Original: {ex.prompt}\n" +
-            f"Analysis: {ex.analysis}\n" +
-            f"Improved: {ex.improved_prompt}"
-            for ex in examples
-        ])
+        examples_text = "\n\n".join(
+            [
+                f"Original: {ex.prompt}\n"
+                + f"Analysis: {ex.analysis}\n"
+                + f"Improved: {ex.improved_prompt}"
+                for ex in examples
+            ]
+        )
 
         # Create a module that uses the signature with examples
         refiner: dspy.ChainOfThought = dspy.ChainOfThought(ExamplePromptRefiner)
 
         # Apply the module with examples as context to refine the prompt
         refinement_payload: dspy.DSPyResult = refiner(
-            prompt=prompt_text,
-            examples=examples_text
+            prompt=prompt_text, examples=examples_text
         )
 
         if self.verbose:
