@@ -14,7 +14,10 @@
   "terminal.integrated.profiles.linux": {
     "PowerShell (No Profile)": {
       "path": "/usr/bin/pwsh",
-      "args": ["-NoProfile", "-NoLogo"],
+      "args": [
+        "-NoProfile",
+        "-NoLogo"
+      ],
       "icon": "terminal-powershell"
     },
     "PowerShell (With Profile)": {
@@ -22,7 +25,9 @@
     },
     "Bash (With Profile)": {
       "path": "/bin/bash",
-      "args": ["--login"],
+      "args": [
+        "--login"
+      ],
       "icon": "terminal-bash"
     },
     "Nushell": {
@@ -33,13 +38,21 @@
     },
     "Bash (No Profile)": {
       "path": "/bin/bash",
-      "args": ["--noprofile", "--norc"]
+      "args": [
+        "--noprofile",
+        "--norc"
+      ]
     },
     "Poetry": {
       "overrideName": true,
       "icon": "snake",
       "color": "terminal.ansiCyan",
-      "args": ["-l", "-i", "-c", "poetry shell || { bash -i ; }"],
+      "args": [
+        "-l",
+        "-i",
+        "-c",
+        "poetry shell || { bash -i ; }"
+      ],
       "path": "bash"
     }
   },
@@ -47,7 +60,10 @@
   "terminal.integrated.profiles.windows": {
     "PowerShell (No Profile)": {
       "source": "PowerShell",
-      "args": ["-NoProfile", "-NoLogo"],
+      "args": [
+        "-NoProfile",
+        "-NoLogo"
+      ],
       "icon": "terminal-powershell"
     },
     "PowerShell (With Profile)": {
@@ -91,7 +107,10 @@
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.tabSize": 4,
-    "editor.rulers": [88, 120],
+    "editor.rulers": [
+      88,
+      120
+    ],
     "editor.codeActionsOnSave": {
       "source.organizeImports": "always"
     },

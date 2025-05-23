@@ -2,27 +2,25 @@
 name = "prompt_optimizer"
 version = "0.1.0"
 description = "A tool to optimize prompts using DSPy framework"
-authors = ["Manus"]
+authors = ["da-moon"]
 readme = "README.md"
 packages = [{include = "prompt_optimizer"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-dspy-ai = ">=2.6.23"
-click = ">=8.0.0"
-anthropic = ">=0.51.0"
+dspy-ai = ">=2.6.24"
+click = ">=8.2.1"
+anthropic = ">=0.52.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.0.0"
-isort = "^5.12.0"
-mypy = "^1.8.0"
-pylint = "^3.0.0"
-pytest = "^7.4.0"
-pytest-cov = "^4.1.0"
+black = "^25.1.0"
+isort = "^6.0.1"
+mypy = "^1.15.0"
+pylint = "^3.3.7"
+pytest = "^8.3.5"
+pytest-cov = "^6.1.1"
 pyright = "^1.1.401"
-
-[tool.poetry.scripts]
-dspy-prompt-optimizer = "prompt_optimizer.cli:main"
+poetry-plugin-up = "^0.9.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -80,3 +78,8 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 python_functions = "test_*"
 python_classes = "Test*"
+
+
+[tool.poetry.scripts]
+dspy-prompt-optimizer = "prompt_optimizer.cli:main"
+

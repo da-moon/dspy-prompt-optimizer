@@ -13,15 +13,17 @@ from .optimizer import optimize_prompt
 @click.argument('input_prompt', type=click.File('r'), default=sys.stdin)
 @click.option('--output', '-o', type=click.File('w'), default=sys.stdout,
               help='Output file for the optimized prompt. Defaults to stdout.')
-@click.option('--model', '-m', default='claude-sonnet-4-0',
+@click.option('--model', '-m', default='claude-3-7-sonnet-latest',
               help='Model to use for optimization. Defaults to claude-3-7-sonnet-latest.')
 @click.option('--api-key', '-k', envvar='ANTHROPIC_API_KEY',
               help='Anthropic API key. Can also be set via ANTHROPIC_API_KEY environment variable.')
 @click.option('--optimization-type', '-t', type=click.Choice(['self', 'example', 'metric']), default='self',
               help='Type of optimization to perform: self-refinement, example-based, or metric-based.')
+@click.option('--max-iterations', '-i', type=int, default=3,
+              help='Maximum number of iterations for metric-based optimization. Defaults to 3.')
 @click.option('--verbose', '-v', is_flag=True, help='Enable verbose output.')
 def main(input_prompt: TextIO, output: TextIO, model: str, api_key: Optional[str],
-         optimization_type: str, verbose: bool) -> None:
+         optimization_type: str, max_iterations: int, verbose: bool) -> None:
     """
     Optimize a prompt using DSPy framework.
 
@@ -44,6 +46,7 @@ def main(input_prompt: TextIO, output: TextIO, model: str, api_key: Optional[str
             model=model,
             api_key=api_key,
             optimization_type=optimization_type,
+            max_iterations=max_iterations,
             verbose=verbose
         )
 

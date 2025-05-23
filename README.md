@@ -146,6 +146,9 @@ poetry run dspy-prompt-optimizer your_prompt.txt -o optimized_prompt.txt
 # Choose optimization approach
 poetry run dspy-prompt-optimizer your_prompt.txt -t example
 
+# Use metric-based optimization with custom iterations
+poetry run dspy-prompt-optimizer your_prompt.txt -t metric -i 5
+
 # Enable verbose output
 poetry run dspy-prompt-optimizer your_prompt.txt -v
 ```
@@ -160,6 +163,8 @@ poetry run dspy-prompt-optimizer your_prompt.txt -v
   environment variable)
 - `--optimization-type, -t`: Type of optimization to perform: self, example, or
   metric (defaults to self)
+- `--max-iterations, -i`: Maximum number of iterations for metric-based
+  optimization (defaults to 3)
 - `--verbose, -v`: Enable verbose output
 
 ## Using Poetry Commands
@@ -309,10 +314,6 @@ improvement process:
 This approach is more powerful when you have specific examples of the kinds of
 improvements you want.
 
-**Note:** In the current implementation with DSPy 2.6.23, the example-based
-optimization approach has compatibility issues due to API changes in DSPy. This
-is documented as a known limitation and may require updates as DSPy evolves.
-
 ### 3. Metric-Based Optimization
 
 Metric-based optimization iteratively improves prompts based on quantifiable
@@ -322,9 +323,11 @@ metrics:
 - Generates candidate improvements and evaluates them
 - Keeps the best-performing version
 - Can run for multiple iterations to progressively improve
+- The number of iterations can be configured using the `--max-iterations` flag
 
 This approach is the most sophisticated and can achieve the best results with
-sufficient iterations.
+sufficient iterations. You can control the optimization intensity by adjusting
+the maximum number of iterations (default is 3).
 
 ## Example Workflow
 
@@ -349,6 +352,12 @@ Here's a typical workflow for optimizing a prompt for Claude Sonnet 3.7:
    ```bash
    export ANTHROPIC_API_KEY="your-api-key"
    poetry run dspy-prompt-optimizer original_prompt.txt -o optimized_prompt.txt -t metric -v
+   ```
+
+   Or with custom iterations for more intensive optimization:
+
+   ```bash
+   poetry run dspy-prompt-optimizer original_prompt.txt -o optimized_prompt.txt -t metric -i 5 -v
    ```
 
 4. Review the optimized prompt in `optimized_prompt.txt`
