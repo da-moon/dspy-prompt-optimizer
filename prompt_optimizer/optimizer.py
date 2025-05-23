@@ -29,7 +29,7 @@ class PromptOptimizer:
            # Set up DSPy with Anthropic
         self._setup_dspy()
     
-    def _setup_dspy(self):
+    def _setup_dspy(self) -> None:
         """Set up DSPy with the Anthropic model."""
         # Configure the LM using Anthropic
         self.lm = dspy.LM(
@@ -89,7 +89,7 @@ class SelfRefinementOptimizer(PromptOptimizer):
         if self.verbose:
             logger.info(f"Analysis: {result.analysis}")
         
-        return result.improved_prompt
+        return str(result.improved_prompt)
 
 
 class ExampleBasedOptimizer(PromptOptimizer):
@@ -135,7 +135,8 @@ class ExampleBasedOptimizer(PromptOptimizer):
         
         # Use the examples directly with the module
         # Modern DSPy no longer uses Teleprompter but instead uses the examples directly
-        result = None
+        # Initialize refinement_payload to explicitly type it for mypy
+        refinement_payload: Any = None
         
         # Process each example to train the module
         for example in examples:
@@ -143,12 +144,12 @@ class ExampleBasedOptimizer(PromptOptimizer):
             refiner.update_demos([example])
         
         # Apply the module with learned examples to refine the prompt
-        result: Any = refiner(prompt=prompt_text)
+        refinement_payload = refiner(prompt=prompt_text)
         
-        if self.verbose and result:
-            logger.info(f"Analysis: {result.analysis}")
+        if self.verbose and refinement_payload:
+            logger.info(f"Analysis: {refinement_payload.analysis}")
         
-        return result.improved_prompt if result else "Failed to optimize prompt using example-based approach"
+        return str(refinement_payload.improved_prompt) if refinement_payload else "Failed to optimize prompt using example-based approach"
 
 
 class MetricBasedOptimizer(PromptOptimizer):
@@ -209,12 +210,12 @@ class MetricBasedOptimizer(PromptOptimizer):
             candidate_prompt = result.improved_prompt
             
             # Evaluate the candidate prompt
-            evaluation: Any = evaluator(prompt=candidate_prompt)
-            candidate_score = int(evaluation.total_score)
+            candidate_evaluation: Any = evaluator(prompt=candidate_prompt)
+            candidate_score = int(candidate_evaluation.total_score)
             
             if self.verbose:
                 logger.info(f"Iteration {i+1} score: {candidate_score}")
-                logger.info(f"Feedback: {evaluation.feedback}")
+                logger.info(f"Feedback: {candidate_evaluation.feedback}")
             
             # Keep the better prompt
             if candidate_score > best_score:
@@ -247,6 +248,7 @@ def optimize_prompt(
     Returns:
         The optimized prompt text
     """
+    optimizer: PromptOptimizer
     # Select the appropriate optimizer based on the optimization type
     if optimization_type == "self":
         optimizer = SelfRefinementOptimizer(model=model, api_key=api_key, verbose=verbose)

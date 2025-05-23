@@ -72,3 +72,5 @@ local.log
 logs/
 tmp/
 .dspy_cache/
+prompts/
+prompts/*

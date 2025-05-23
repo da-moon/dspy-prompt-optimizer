@@ -362,7 +362,56 @@ Here's a typical workflow for optimizing a prompt for Claude Sonnet 3.7:
 
 ## Build and Packaging
 
-Poetry makes it eas
+This project uses Poetry for managing dependencies, building, and packaging.
+
+### Building the Project
+
+Poetry simplifies the build process. To build the source and wheel distributions, run the following command in the project's root directory:
+
+```bash
+poetry build
+```
+
+This command performs several steps:
+1.  It resolves the project dependencies.
+2.  It creates a source distribution (sdist) in `.tar.gz` format.
+3.  It creates a wheel distribution (a built package) in `.whl` format.
+
+Both build artifacts will be placed in the `dist/` directory within your project. For example:
+```
+dist/
+├── dspy_prompt_optimizer-0.1.0-py3-none-any.whl
+└── dspy-prompt-optimizer-0.1.0.tar.gz
+```
+(The version number `0.1.0` will correspond to the version specified in your `pyproject.toml` file.)
+
+These files can then be used for distribution or installation using pip:
+```bash
+pip install dist/dspy_prompt_optimizer-0.1.0-py3-none-any.whl
+```
+
+### Publishing (Optional)
+
+If you intend to publish the package to the Python Package Index (PyPI) or a private repository, Poetry provides the `publish` command:
+
+```bash
+poetry publish --build
+```
+The `--build` option tells Poetry to build the package (if not already built) before publishing.
+
+Before publishing, you will need to configure Poetry with your repository credentials. For PyPI, this usually involves setting up an API token. Refer to the [official Poetry documentation on publishing](https://python-poetry.org/docs/publishing/) for detailed instructions.
+
+### Cleaning Build Artifacts
+
+Poetry does not have a dedicated `clean` command like `make clean`. To remove build artifacts, you can manually delete the `dist/` directory:
+
+```bash
+rm -rf dist/
+```
+If you also want to remove any build-specific caches or compiled Python files, you might also consider removing `*.pyc` files and `__pycache__` directories, though these are generally managed by Python itself.
+```
+
+</edits>
 
 ## Troubleshooting
 
