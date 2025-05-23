@@ -5,22 +5,62 @@
     "source.fixAll.convertImportFormat": "always",
     "source.organizeImports": "always"
   },
-  "terminal.integrated.defaultProfile.linux": "poetry",
+  "terminal.integrated.defaultProfile.linux": "Bash (No Profile)",
   "terminal.integrated.env.linux": {
+    "PSModulePath": "${env:HOME}/.local/share/powershell/Modules:/usr/local/share/powershell/Modules:/opt/microsoft/powershell/7/Modules",
     "POETRY_VIRTUALENVS_CREATE": "true",
     "POETRY_VIRTUALENVS_IN_PROJECT": "true"
   },
   "terminal.integrated.profiles.linux": {
-    "bash": {
-      "path": "bash",
-      "args": ["-i"]
+    "PowerShell (No Profile)": {
+      "path": "/usr/bin/pwsh",
+      "args": ["-NoProfile", "-NoLogo"],
+      "icon": "terminal-powershell"
     },
-    "poetry": {
+    "PowerShell (With Profile)": {
+      "path": "/usr/bin/pwsh"
+    },
+    "Bash (With Profile)": {
+      "path": "/bin/bash",
+      "args": ["--login"],
+      "icon": "terminal-bash"
+    },
+    "Nushell": {
+      "path": "nu",
+      "args": [
+        "-i"
+      ]
+    },
+    "Bash (No Profile)": {
+      "path": "/bin/bash",
+      "args": ["--noprofile", "--norc"]
+    },
+    "Poetry": {
       "overrideName": true,
       "icon": "snake",
       "color": "terminal.ansiCyan",
       "args": ["-l", "-i", "-c", "poetry shell || { bash -i ; }"],
       "path": "bash"
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "PowerShell (No Profile)",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell (No Profile)": {
+      "source": "PowerShell",
+      "args": ["-NoProfile", "-NoLogo"],
+      "icon": "terminal-powershell"
+    },
+    "PowerShell (With Profile)": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell"
+    },
+    "Command Prompt": {
+      "path": [
+        "${env:windir}\\Sysnative\\cmd.exe",
+        "${env:windir}\\System32\\cmd.exe"
+      ],
+      "args": [],
+      "icon": "terminal-cmd"
     }
   },
   "files.exclude": {
