@@ -46,6 +46,6 @@ class SelfRefinementOptimizer(PromptOptimizer):
         result = refiner(prompt=prompt_text)
 
         if self.verbose:
-            logger.info("Analysis: %s", result.analysis)
+            logger.info(f"Analysis: {result.analysis}")
 
         return result.improved_prompt

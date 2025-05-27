@@ -46,9 +46,8 @@ class PromptOptimizer:
 
         if self.verbose:
             logger.info(
-                "DSPy configured with model: %s (max_tokens=%d)",
-                self.model,
-                self.max_tokens,
+                f"DSPy configured with model: {self.model} "
+                f"(max_tokens={self.max_tokens})"
             )
 
     def optimize(self, prompt_text: str) -> str:
