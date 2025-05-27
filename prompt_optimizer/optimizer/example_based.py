@@ -94,6 +94,6 @@ class ExampleBasedOptimizer(PromptOptimizer):
         refinement_payload = refiner(prompt=prompt_text, examples=examples_text)
 
         if self.verbose:
-            logger.info("Analysis: %s", refinement_payload.analysis)
+            logger.info(f"Analysis: {refinement_payload.analysis}")
 
         return refinement_payload.improved_prompt
