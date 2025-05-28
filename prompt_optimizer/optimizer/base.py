@@ -2,8 +2,8 @@
 Base class for prompt optimization strategies.
 """
 
-from dataclasses import dataclass, field
 import logging
+from dataclasses import dataclass, field
 from typing import Final
 
 import dspy
@@ -33,7 +33,23 @@ class PromptOptimizer:
         self._setup_dspy()
 
     def _setup_dspy(self) -> None:
-        """Set up DSPy with the Anthropic model."""
+        """Configure DSPy for use with the Anthropic model.
+
+        This method instantiates :class:`dspy.LM` using ``self.model`` and
+        ``self.api_key``. The resulting language model is stored on
+        ``self.lm`` and registered as the default via :func:`dspy.configure`.
+        When ``self.verbose`` is ``True`` a log message noting the chosen
+        model and ``max_tokens`` is emitted.
+
+        Args:
+            None: All configuration values are read from the instance
+                attributes.
+
+        Raises:
+            ValueError: If ``api_key`` is empty.
+            RuntimeError: If the language model cannot be created or DSPy
+                configuration fails.
+        """
         # Configure the LM using Anthropic with custom max_tokens
         self.lm = dspy.LM(
             self.model,
