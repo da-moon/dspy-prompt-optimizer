@@ -134,7 +134,8 @@ compatible with the project requirements.
 
 ## Usage
 
-The DSPy Prompt Optimizer uses a command-line interface with subcommands for different optimization strategies:
+The DSPy Prompt Optimizer uses a command-line interface with subcommands for
+different optimization strategies:
 
 ### Basic Usage Patterns
 
@@ -176,6 +177,7 @@ poetry run dspy-prompt-optimizer -- metric your_prompt.txt -v -i 3
 The tool provides four main commands:
 
 #### `self` - Self-Refinement Optimization
+
 Optimizes prompts using self-analysis and improvement.
 
 ```bash
@@ -183,6 +185,7 @@ poetry run dspy-prompt-optimizer -- self [OPTIONS] [INPUT_PROMPT]
 ```
 
 #### `example` - Example-Based Optimization
+
 Uses examples to guide prompt optimization.
 
 ```bash
@@ -190,6 +193,7 @@ poetry run dspy-prompt-optimizer -- example [OPTIONS] [INPUT_PROMPT]
 ```
 
 #### `metric` - Metric-Based Optimization
+
 Iteratively optimizes based on quantifiable metrics.
 
 ```bash
@@ -197,6 +201,7 @@ poetry run dspy-prompt-optimizer -- metric [OPTIONS] [INPUT_PROMPT]
 ```
 
 #### `generate-examples` - Example Generation
+
 Generates examples for later use in example-based optimization.
 
 ```bash
@@ -207,22 +212,28 @@ poetry run dspy-prompt-optimizer -- generate-examples [OPTIONS] OUTPUT_FILE
 
 - `INPUT_PROMPT`: File containing the prompt to optimize (defaults to stdin)
 - `--output, -o`: Output file for the optimized prompt (defaults to stdout)
-- `--model, -m`: Model to use for optimization (defaults to claude-sonnet-4-20250514)
-- `--api-key, -k`: Anthropic API key (can also be set via `ANTHROPIC_API_KEY` environment variable)
+- `--model, -m`: Model to use for optimization (defaults to
+  claude-sonnet-4-20250514)
+- `--api-key, -k`: Anthropic API key (can also be set via `ANTHROPIC_API_KEY`
+  environment variable)
 - `--max-tokens`: Maximum number of tokens for LM generation (defaults to 8000)
 - `--verbose, -v`: Enable verbose output
 
 ### Example-Specific Options
 
 - `--num-examples, -n`: Number of examples to generate or use (defaults to 3)
-- `--example-generator-model, --eg-model`: Model for example generation (defaults to claude-3-5-haiku-latest)
-- `--example-generator-api-key, --eg-api-key`: Separate API key for example generation
-- `--example-generator-max-tokens, --eg-max-tokens`: Maximum tokens for example generator (defaults to same as optimizer)
+- `--example-generator-model, --eg-model`: Model for example generation
+  (defaults to claude-3-5-haiku-latest)
+- `--example-generator-api-key, --eg-api-key`: Separate API key for example
+  generation
+- `--example-generator-max-tokens, --eg-max-tokens`: Maximum tokens for example
+  generator (defaults to same as optimizer)
 - `--examples-file, -f`: JSON file containing pre-generated examples
 
 ### Metric-Specific Options
 
-- `--max-iterations, -i`: Maximum number of iterations for optimization (defaults to 3)
+- `--max-iterations, -i`: Maximum number of iterations for optimization
+  (defaults to 3)
 
 ## Using Poetry Commands
 
@@ -420,6 +431,7 @@ Here's a typical workflow for optimizing a prompt for Claude Sonnet 3.7:
 4. Review the optimized prompt in `optimized_prompt.txt`
 
 5. Try different optimization approaches to compare results:
+
    ```bash
    poetry run dspy-prompt-optimizer -- self original_prompt.txt -o optimized_self.txt -v
    poetry run dspy-prompt-optimizer -- example original_prompt.txt -o optimized_example.txt -v
@@ -427,10 +439,11 @@ Here's a typical workflow for optimizing a prompt for Claude Sonnet 3.7:
    ```
 
 6. For advanced example-based optimization, use the two-phase approach:
+
    ```bash
    # Phase 1: Generate examples
    poetry run dspy-prompt-optimizer -- generate-examples examples.json -n 5 -v
-   
+
    # Phase 2: Use examples for optimization
    poetry run dspy-prompt-optimizer -- example original_prompt.txt -f examples.json -o optimized_prompt.txt -v
    ```
@@ -441,52 +454,67 @@ This project uses Poetry for managing dependencies, building, and packaging.
 
 ### Building the Project
 
-Poetry simplifies the build process. To build the source and wheel distributions, run the following command in the project's root directory:
+Poetry simplifies the build process. To build the source and wheel
+distributions, run the following command in the project's root directory:
 
 ```bash
 poetry build
 ```
 
 This command performs several steps:
+
 1.  It resolves the project dependencies.
 2.  It creates a source distribution (sdist) in `.tar.gz` format.
 3.  It creates a wheel distribution (a built package) in `.whl` format.
 
-Both build artifacts will be placed in the `dist/` directory within your project. For example:
+Both build artifacts will be placed in the `dist/` directory within your
+project. For example:
+
 ```
 dist/
 ├── dspy_prompt_optimizer-0.1.0-py3-none-any.whl
 └── dspy-prompt-optimizer-0.1.0.tar.gz
 ```
-(The version number `0.1.0` will correspond to the version specified in your `pyproject.toml` file.)
+
+(The version number `0.1.0` will correspond to the version specified in your
+`pyproject.toml` file.)
 
 These files can then be used for distribution or installation using pip:
+
 ```bash
 pip install dist/dspy_prompt_optimizer-0.1.0-py3-none-any.whl
 ```
 
 ### Publishing (Optional)
 
-If you intend to publish the package to the Python Package Index (PyPI) or a private repository, Poetry provides the `publish` command:
+If you intend to publish the package to the Python Package Index (PyPI) or a
+private repository, Poetry provides the `publish` command:
 
 ```bash
 poetry publish --build
 ```
-The `--build` option tells Poetry to build the package (if not already built) before publishing.
 
-Before publishing, you will need to configure Poetry with your repository credentials. For PyPI, this usually involves setting up an API token. Refer to the [official Poetry documentation on publishing](https://python-poetry.org/docs/publishing/) for detailed instructions.
+The `--build` option tells Poetry to build the package (if not already built)
+before publishing.
+
+Before publishing, you will need to configure Poetry with your repository
+credentials. For PyPI, this usually involves setting up an API token. Refer to
+the
+[official Poetry documentation on publishing](https://python-poetry.org/docs/publishing/)
+for detailed instructions.
 
 ### Cleaning Build Artifacts
 
-Poetry does not have a dedicated `clean` command like `make clean`. To remove build artifacts, you can manually delete the `dist/` directory:
+Poetry does not have a dedicated `clean` command like `make clean`. To remove
+build artifacts, you can manually delete the `dist/` directory:
 
 ```bash
 rm -rf dist/
 ```
-If you also want to remove any build-specific caches or compiled Python files, you might also consider removing `*.pyc` files and `__pycache__` directories, though these are generally managed by Python itself.
-```
 
-</edits>
+If you also want to remove any build-specific caches or compiled Python files,
+you might also consider removing `*.pyc` files and `__pycache__` directories,
+though these are generally managed by Python itself.
 
 ## Troubleshooting
 
@@ -495,7 +523,7 @@ If you also want to remove any build-specific caches or compiled Python files, y
 If you encounter errors related to the API key:
 
 - Ensure you've set the `ANTHROPIC_API_KEY` environment variable or passed it
-  with `-k`
+  with `-k` flag
 - Verify the API key is valid and has not expired
 - Check for any whitespace or special characters that might have been copied
   with the key
@@ -519,17 +547,22 @@ If you encounter issues with Poetry:
 
 If you encounter errors related to token limits:
 
-- **Error message**: "LM response was truncated due to exceeding max_tokens=8000"
+- **Error message**: "LM response was truncated due to exceeding
+  max_tokens=8000"
 
 - **Solution**: Use the `--max-tokens` flag to increase the token limit:
+
   ```bash
   poetry run dspy-prompt-optimizer -- self your_prompt.txt --max-tokens 128000
   ```
 
-- **Default value**: The default is 8000 tokens, which should handle most use cases
-- **Considerations**: Higher token limits may increase response time and API costs
+- **Default value**: The default is 8000 tokens, which should handle most use
+  cases
+- **Considerations**: Higher token limits may increase response time and API
+  costs
 - **For complex prompts**: Use higher values like 128000 or 256000 tokens
-- **For example generation**: Use separate token limits with `--example-generator-max-tokens`:
+- **For example generation**: Use separate token limits with
+  `--example-generator-max-tokens`:
   ```bash
   poetry run dspy-prompt-optimizer -- example your_prompt.txt \
     --max-tokens 128000 \
@@ -572,15 +605,5 @@ If you encounter Python version compatibility issues:
 
 Potential improvements for future versions:
 
-- Support for more LLM providers beyond Anthropic
-- Custom optimization metrics definition
-- User interface for interactive prompt optimization
-- Integration with prompt management systems
 - Batch processing of multiple prompts
-- Fine-tuning optimization parameters
-- Additional optimization approaches
-- Persistent storage of optimization history
-
-This project was created to demonstrate DSPy's capabilities for prompt
-optimization. For more information about DSPy, visit the
-[official DSPy documentation](https://dspy-docs.vercel.app/).
+- Support for more LLM providers beyond Anthropic
