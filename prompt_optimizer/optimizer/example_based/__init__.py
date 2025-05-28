@@ -1,6 +1,6 @@
 """Example-based optimization module."""
 
-from .optimizer import ExampleBasedOptimizer
 from .generator import ExampleGenerator
+from .optimizer import ExampleBasedOptimizer
 
 __all__ = ["ExampleBasedOptimizer", "ExampleGenerator"]

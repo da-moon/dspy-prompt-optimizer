@@ -10,8 +10,8 @@ from typing import Final, cast
 
 import dspy
 
-from .generator import ExampleGenerator
 from ..base import PromptOptimizer
+from .generator import ExampleGenerator
 
 LOGGER: Final[logging.Logger] = logging.getLogger(__name__)
 
