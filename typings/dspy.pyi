@@ -4,7 +4,17 @@ from typing import Type, Protocol, runtime_checkable
 from pydantic.fields import FieldInfo
 
 # Make DSPyResult available at module level
-__all__ = ["DSPyResult", "InputField", "OutputField", "Signature", "Example", "LM", "Predict", "ChainOfThought", "configure"]
+__all__ = [
+    "DSPyResult",
+    "InputField",
+    "OutputField",
+    "Signature",
+    "Example",
+    "LM",
+    "Predict",
+    "ChainOfThought",
+    "configure",
+]
 
 # Protocol for DSPy result objects that have dynamic attributes
 @runtime_checkable

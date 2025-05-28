@@ -73,8 +73,7 @@ class ExampleGenerator:
         # This is safe because DSPy guarantees these parameters exist for this signature
         result_callable = getattr(example_generator, "__call__")
         result = result_callable(
-            task_description=task_desc,
-            num_examples=str(self.num_examples)
+            task_description=task_desc, num_examples=str(self.num_examples)
         )
 
         # Parse the generated examples using object introspection
@@ -120,7 +119,9 @@ class ExampleGenerator:
             raise ValueError(f"Invalid JSON in {path}: {exc}") from exc
 
         if not isinstance(raw_data, list):
-            raise ValueError(f"Invalid JSON format: expected list, got {type(raw_data)}")
+            raise ValueError(
+                f"Invalid JSON format: expected list, got {type(raw_data)}"
+            )
 
         data: list[dict[str, str]] = []
         for raw_item in raw_data:

@@ -14,13 +14,15 @@ from .optimizer.self_refinement import SelfRefinementOptimizer
 
 
 # Common options for all subcommands
-P = ParamSpec('P')
-R = TypeVar('R')
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
 def common_options(func: Callable[P, R]) -> Callable[P, R]:
     """Decorator to add common options to all subcommands."""
-    func = click.option("--verbose", "-v", is_flag=True, help="Enable verbose output.")(func)
+    func = click.option("--verbose", "-v", is_flag=True, help="Enable verbose output.")(
+        func
+    )
     func = click.option(
         "--max-tokens",
         type=int,
@@ -333,7 +335,10 @@ def generate_examples(
 
         if verbose:
             click.echo(f"Examples saved to {output_file}", err=True)
-            click.echo("Review and edit the examples, then use them with: dspy-prompt-optimizer example --examples-file", err=True)
+            click.echo(
+                "Review and edit the examples, then use them with: dspy-prompt-optimizer example --examples-file",
+                err=True,
+            )
         else:
             click.echo(str(output_file))
 

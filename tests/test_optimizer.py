@@ -90,8 +90,12 @@ def mock_dspy(monkeypatch: "MonkeyPatch") -> None:
         def generate_examples(self) -> list[SimpleNamespace]:
             return [fake_dspy.Example(prompt="p", analysis="a", improved_prompt="i")]
 
-    monkeypatch.setattr(example_generator_module, "ExampleGenerator", FakeExampleGenerator)
-    monkeypatch.setattr(example_based_optimizer_module, "ExampleGenerator", FakeExampleGenerator)
+    monkeypatch.setattr(
+        example_generator_module, "ExampleGenerator", FakeExampleGenerator
+    )
+    monkeypatch.setattr(
+        example_based_optimizer_module, "ExampleGenerator", FakeExampleGenerator
+    )
 
 
 def test_self_refinement_optimizer(mock_dspy: None) -> None:
