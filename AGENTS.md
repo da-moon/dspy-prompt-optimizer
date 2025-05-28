@@ -409,6 +409,33 @@ class OrderBuilder:
 6. **Testing**: Ensure changes don't break existing functionality
 7. **Backwards compatibility**: Maintain API compatibility unless explicitly changing it
 
+### Post-Change Linting and Formatting (MANDATORY)
+After making ANY code changes, run the following commands in this EXACT order:
+
+1. **Type checking with pyright (strict mode)**:
+   ```bash
+   poetry run pyright --project pyrightconfig.strict.json .
+   ```
+   Fix ALL type errors before proceeding.
+
+2. **Type checking with mypy**:
+   ```bash
+   poetry run mypy .
+   ```
+   Fix ALL mypy errors before proceeding.
+
+3. **Code formatting with black**:
+   ```bash
+   poetry run black .
+   ```
+   This ensures consistent code formatting across the project.
+
+**IMPORTANT**: 
+- Never skip any of these steps
+- Fix all issues reported by pyright and mypy
+- Re-run the linters after fixes to ensure no regressions
+- Only consider code complete when all checks pass
+
 ### Code Quality Checklist (Must verify ALL items)
 Before considering any code complete, ensure:
 - [ ] All functions have complete type annotations (parameters and return types)
