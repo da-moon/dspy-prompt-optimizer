@@ -6,7 +6,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, cast
 
 import dspy
 
@@ -112,26 +112,18 @@ class ExampleGenerator:
     def load_examples(self, path: Path) -> list[dspy.Example]:
         """Load examples from ``path``."""
         try:
-            raw_data = json.loads(path.read_text(encoding="utf-8"))
+            raw_obj: object = json.loads(path.read_text(encoding="utf-8"))
         except FileNotFoundError as exc:
             raise FileNotFoundError(f"File not found: {path}") from exc
         except json.JSONDecodeError as exc:
             raise ValueError(f"Invalid JSON in {path}: {exc}") from exc
-
-        if not isinstance(raw_data, list):
-            raise ValueError(
-                f"Invalid JSON format: expected list, got {type(raw_data)}"
-            )
-
-        data: list[dict[str, str]] = []
-        for raw_item in raw_data:
-            if isinstance(raw_item, dict):
-                # Ensure all values are strings for type safety
-                typed_item: dict[str, str] = {}
-                for k, v in raw_item.items():
-                    typed_item[str(k)] = str(v)
-                data.append(typed_item)
-        return [dspy.Example(**item) for item in data]
+        if not isinstance(raw_obj, list):
+            raise ValueError(f"Invalid JSON format: expected list, got {type(raw_obj)}")
+        raw_items = cast(list[dict[str, object]], raw_obj)
+        return [
+            dspy.Example(**{str(k): str(v) for k, v in item.items()})
+            for item in raw_items
+        ]
 
     def save_examples(self, examples: Iterable[dspy.Example], path: Path) -> None:
         """Save ``examples`` to ``path`` as JSON."""

@@ -104,8 +104,8 @@ def mock_dspy_for_cli(monkeypatch: "MonkeyPatch") -> None:
 
     # Mock dspy in all relevant modules
     import prompt_optimizer.optimizer.base as base_module
-    import prompt_optimizer.optimizer.example_based.optimizer as example_based_optimizer_module
     import prompt_optimizer.optimizer.example_based.generator as example_generator_module
+    import prompt_optimizer.optimizer.example_based.optimizer as example_based_optimizer_module
 
     monkeypatch.setattr(base_module, "dspy", fake_dspy)
     monkeypatch.setattr(example_based_optimizer_module, "dspy", fake_dspy)

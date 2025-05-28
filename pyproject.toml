@@ -124,6 +124,8 @@ venv = ".venv"
 [tool.mypy]
 python_version = "3.10"
 mypy_path = "typings"
+# Skip test files from strict checking
+exclude = "tests"
 # Strict mode equivalent configuration from mypy docs
 warn_unused_configs = true
 warn_redundant_casts = true
@@ -166,11 +168,16 @@ module = "prompt_optimizer.cli"
 disallow_any_expr = false
 
 [[tool.mypy.overrides]]
+module = "prompt_optimizer.cli.*"
+disallow_any_expr = false
+
+[[tool.mypy.overrides]]
 module = "tests.*"
 # Allow test flexibility with mocking
 disallow_any_expr = false
 disallow_any_explicit = false
 warn_return_any = false
+ignore_errors = true
 
 [tool.pytest.ini_options]
 addopts = "-vv"

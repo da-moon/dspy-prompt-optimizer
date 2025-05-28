@@ -7,8 +7,8 @@ if TYPE_CHECKING:
 import pytest
 
 import prompt_optimizer.optimizer.base as base_module
-import prompt_optimizer.optimizer.example_based.optimizer as example_based_optimizer_module
 import prompt_optimizer.optimizer.example_based.generator as example_generator_module
+import prompt_optimizer.optimizer.example_based.optimizer as example_based_optimizer_module
 import prompt_optimizer.optimizer.metric_based as metric_based_module
 import prompt_optimizer.optimizer.self_refinement as self_refinement_module
 from prompt_optimizer.optimizer import (
