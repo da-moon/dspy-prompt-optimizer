@@ -33,6 +33,19 @@ def metric_command(
     verbose: bool,
 ) -> None:
     """Optimize a prompt using metric-based approach."""
+    _run_metric_optimization(input_prompt, output, model, api_key, max_iterations, max_tokens, verbose)
+
+
+def _run_metric_optimization(
+    input_prompt: TextIO,
+    output: TextIO,
+    model: str,
+    api_key: Optional[str],
+    max_iterations: int,
+    max_tokens: int,
+    verbose: bool,
+) -> None:
+    """Execute metric-based optimization workflow."""
     api = validate_api_key(api_key)
     prompt = read_input_prompt(input_prompt)
     echo_start("metric-based", model, max_tokens, verbose)
