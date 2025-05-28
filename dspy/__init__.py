@@ -1,5 +1,6 @@
 """Minimal runtime stub for the DSPy library used in tests."""
 
+
 class Signature:
     """Base class for DSPy signatures."""
 
@@ -36,7 +37,8 @@ class Example:
     """Placeholder for Example."""
 
     def __init__(self, *args: object, **kwargs: object) -> None:
-        pass
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
 
 class LM:
