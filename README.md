@@ -134,42 +134,95 @@ compatible with the project requirements.
 
 ## Usage
 
-The DSPy Prompt Optimizer can be used as a command-line tool:
+The DSPy Prompt Optimizer uses a command-line interface with subcommands for different optimization strategies:
+
+### Basic Usage Patterns
 
 ```bash
-# Basic usage (reads from stdin, outputs to stdout)
-cat your_prompt.txt | poetry run dspy-prompt-optimizer
+# Self-refinement optimization (simplest approach)
+cat your_prompt.txt | poetry run dspy-prompt-optimizer -- self
 
-# Specify input and output files
-poetry run dspy-prompt-optimizer your_prompt.txt -o optimized_prompt.txt
+# Example-based optimization
+poetry run dspy-prompt-optimizer -- example your_prompt.txt -o optimized_prompt.txt
 
-# Choose optimization approach
-poetry run dspy-prompt-optimizer your_prompt.txt -t example
+# Metric-based optimization with custom iterations
+poetry run dspy-prompt-optimizer -- metric your_prompt.txt -i 5 -o optimized_prompt.txt
 
-# Use metric-based optimization with custom iterations
-poetry run dspy-prompt-optimizer your_prompt.txt -t metric -i 5
+# Generate examples for two-phase approach
+poetry run dspy-prompt-optimizer -- generate-examples examples.json
 
-# Configure maximum tokens for longer responses
-poetry run dspy-prompt-optimizer your_prompt.txt --max-tokens 128000
-
-# Enable verbose output
-poetry run dspy-prompt-optimizer your_prompt.txt -v
+# Use pre-generated examples
+poetry run dspy-prompt-optimizer -- example your_prompt.txt --examples-file examples.json
 ```
 
-### Command-line Options
+### Advanced Configuration
+
+```bash
+# Configure maximum tokens for longer responses
+poetry run dspy-prompt-optimizer -- self your_prompt.txt --max-tokens 128000
+
+# Use different models for optimization and example generation
+poetry run dspy-prompt-optimizer -- example your_prompt.txt \
+  --model claude-sonnet-4-20250514 \
+  --example-generator-model claude-3-5-haiku-latest \
+  --example-generator-max-tokens 4000
+
+# Enable verbose output for all operations
+poetry run dspy-prompt-optimizer -- metric your_prompt.txt -v -i 3
+```
+
+### Available Commands
+
+The tool provides four main commands:
+
+#### `self` - Self-Refinement Optimization
+Optimizes prompts using self-analysis and improvement.
+
+```bash
+poetry run dspy-prompt-optimizer -- self [OPTIONS] [INPUT_PROMPT]
+```
+
+#### `example` - Example-Based Optimization
+Uses examples to guide prompt optimization.
+
+```bash
+poetry run dspy-prompt-optimizer -- example [OPTIONS] [INPUT_PROMPT]
+```
+
+#### `metric` - Metric-Based Optimization
+Iteratively optimizes based on quantifiable metrics.
+
+```bash
+poetry run dspy-prompt-optimizer -- metric [OPTIONS] [INPUT_PROMPT]
+```
+
+#### `generate-examples` - Example Generation
+Generates examples for later use in example-based optimization.
+
+```bash
+poetry run dspy-prompt-optimizer -- generate-examples [OPTIONS] OUTPUT_FILE
+```
+
+### Common Options (Available for All Commands)
 
 - `INPUT_PROMPT`: File containing the prompt to optimize (defaults to stdin)
 - `--output, -o`: Output file for the optimized prompt (defaults to stdout)
-- `--model, -m`: Model to use for optimization (defaults to
-  claude-sonnet-4-20250514)
-- `--api-key, -k`: Anthropic API key (can also be set via ANTHROPIC_API_KEY
-  environment variable)
-- `--optimization-type, -t`: Type of optimization to perform: self, example, or
-  metric (defaults to self)
-- `--max-iterations, -i`: Maximum number of iterations for metric-based
-  optimization (defaults to 3)
-- `--max-tokens`: Maximum number of tokens for LM generation (defaults to 64000)
+- `--model, -m`: Model to use for optimization (defaults to claude-sonnet-4-20250514)
+- `--api-key, -k`: Anthropic API key (can also be set via `ANTHROPIC_API_KEY` environment variable)
+- `--max-tokens`: Maximum number of tokens for LM generation (defaults to 8000)
 - `--verbose, -v`: Enable verbose output
+
+### Example-Specific Options
+
+- `--num-examples, -n`: Number of examples to generate or use (defaults to 3)
+- `--example-generator-model, --eg-model`: Model for example generation (defaults to claude-3-5-haiku-latest)
+- `--example-generator-api-key, --eg-api-key`: Separate API key for example generation
+- `--example-generator-max-tokens, --eg-max-tokens`: Maximum tokens for example generator (defaults to same as optimizer)
+- `--examples-file, -f`: JSON file containing pre-generated examples
+
+### Metric-Specific Options
+
+- `--max-iterations, -i`: Maximum number of iterations for optimization (defaults to 3)
 
 ## Using Poetry Commands
 
@@ -355,23 +408,32 @@ Here's a typical workflow for optimizing a prompt for Claude Sonnet 3.7:
 
    ```bash
    export ANTHROPIC_API_KEY="your-api-key"
-   poetry run dspy-prompt-optimizer original_prompt.txt -o optimized_prompt.txt -t metric -v
+   poetry run dspy-prompt-optimizer -- metric original_prompt.txt -o optimized_prompt.txt -v
    ```
 
    Or with custom iterations for more intensive optimization:
 
    ```bash
-   poetry run dspy-prompt-optimizer original_prompt.txt -o optimized_prompt.txt -t metric -i 5 -v
+   poetry run dspy-prompt-optimizer -- metric original_prompt.txt -o optimized_prompt.txt -i 5 -v
    ```
 
 4. Review the optimized prompt in `optimized_prompt.txt`
 
 5. Try different optimization approaches to compare results:
-   ````bash
-   poetry run dspy-prompt-optimizer original_prompt.txt -o optimized_self.txt -t self -v
-   poetry run dspy-prompt-optimizer original_prompt.txt -o optimized_example.txt -t example -v
-   poetry run dspy-prompt-optimizer original_prom   ```
-   ````
+   ```bash
+   poetry run dspy-prompt-optimizer -- self original_prompt.txt -o optimized_self.txt -v
+   poetry run dspy-prompt-optimizer -- example original_prompt.txt -o optimized_example.txt -v
+   poetry run dspy-prompt-optimizer -- metric original_prompt.txt -o optimized_metric.txt -v
+   ```
+
+6. For advanced example-based optimization, use the two-phase approach:
+   ```bash
+   # Phase 1: Generate examples
+   poetry run dspy-prompt-optimizer -- generate-examples examples.json -n 5 -v
+   
+   # Phase 2: Use examples for optimization
+   poetry run dspy-prompt-optimizer -- example original_prompt.txt -f examples.json -o optimized_prompt.txt -v
+   ```
 
 ## Build and Packaging
 
@@ -457,16 +519,22 @@ If you encounter issues with Poetry:
 
 If you encounter errors related to token limits:
 
-- **Error message**: "LM response was truncated due to exceeding max_tokens=4000"
+- **Error message**: "LM response was truncated due to exceeding max_tokens=8000"
 
 - **Solution**: Use the `--max-tokens` flag to increase the token limit:
   ```bash
-  poetry run dspy-prompt-optimizer your_prompt.txt --max-tokens 128000
+  poetry run dspy-prompt-optimizer -- self your_prompt.txt --max-tokens 128000
   ```
 
-- **Default value**: The default is 64000 tokens, which should handle most use cases
+- **Default value**: The default is 8000 tokens, which should handle most use cases
 - **Considerations**: Higher token limits may increase response time and API costs
 - **For complex prompts**: Use higher values like 128000 or 256000 tokens
+- **For example generation**: Use separate token limits with `--example-generator-max-tokens`:
+  ```bash
+  poetry run dspy-prompt-optimizer -- example your_prompt.txt \
+    --max-tokens 128000 \
+    --example-generator-max-tokens 4000
+  ```
 
 ### Dependency Issues
 

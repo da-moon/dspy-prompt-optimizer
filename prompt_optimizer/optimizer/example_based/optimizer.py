@@ -6,58 +6,17 @@ import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Final, cast
+from typing import Final, cast, Any
 
 import dspy
 
-from .base import PromptOptimizer
+from .generator import ExampleGenerator
+from ..base import PromptOptimizer
 
 logger: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-DEFAULT_EXAMPLES: Final[list[dspy.Example]] = [
-    dspy.Example(
-        prompt="Tell me about climate change",
-        analysis=(
-            "This prompt is too vague and doesn't specify what aspects of "
-            "climate change to focus on or what depth of information is needed."
-        ),
-        improved_prompt=(
-            "Provide a comprehensive explanation of the primary causes of "
-            "climate change, focusing on both natural and anthropogenic factors. "
-            "Include recent scientific consensus on the rate of global warming "
-            "and its projected impacts on ecosystems over the next 50 years."
-        ),
-    ),
-    dspy.Example(
-        prompt="How do I make a website?",
-        analysis=(
-            "This prompt lacks specificity about the type of website, the user's "
-            "skill level, or what technologies they're interested in using."
-        ),
-        improved_prompt=(
-            "I'm a beginner with basic HTML/CSS knowledge looking to create a "
-            "personal portfolio website. Please provide a step-by-step guide on "
-            "how to build a responsive portfolio site, including recommended "
-            "frameworks, hosting options, and essential features for showcasing "
-            "my work effectively."
-        ),
-    ),
-]
-
-
-@dataclass
-class ExampleGenerator:
-    """Generate prompt optimization examples."""
-
-    model: str
-    api_key: str
-    num_examples: int = 3
-
-    def generate_examples(self) -> list[dspy.Example]:
-        """Return generated examples."""
-        # Placeholder implementation: return predefined examples
-        return DEFAULT_EXAMPLES[: self.num_examples]
+# Removed hardcoded examples - all examples are now generated dynamically
 
 
 def _load_examples_from_file(path: Path) -> list[dspy.Example]:
@@ -76,13 +35,14 @@ def _load_examples_from_file(path: Path) -> list[dspy.Example]:
     if not isinstance(raw_data, list):
         raise ValueError("Examples file must contain a list of objects")
 
-    raw_examples = cast(list[object], raw_data)
+    # raw_data is confirmed to be a list, but we need to validate it's the right type  
+    raw_examples: list[Any] = raw_data  # pyright: ignore[reportUnknownVariableType]
 
     examples: list[dspy.Example] = []
     for item in raw_examples:
         if not isinstance(item, dict):
             raise ValueError("Each example entry must be an object")
-        entry = cast(dict[str, object], item)
+        entry: dict[str, Any] = cast(dict[str, Any], item)
         examples.append(
             dspy.Example(
                 prompt=str(entry.get("prompt", "")),
@@ -115,6 +75,7 @@ class ExampleBasedOptimizer(PromptOptimizer):
     examples_file: Path | None = None
     example_generator_model: str | None = None
     example_generator_api_key: str | None = None
+    example_generator_max_tokens: int | None = None
     num_examples: int = 3
     _examples: list[dspy.Example] = field(init=False)
 
@@ -128,9 +89,11 @@ class ExampleBasedOptimizer(PromptOptimizer):
             self._examples = _load_examples_from_file(self.examples_file)
         else:
             generator = ExampleGenerator(
-                model=self.example_generator_model or self.model,
+                model=self.example_generator_model or "claude-3-5-haiku-latest",
                 api_key=self.example_generator_api_key or self.api_key,
                 num_examples=self.num_examples,
+                max_tokens=self.example_generator_max_tokens or self.max_tokens,
+                verbose=self.verbose,
             )
             self._examples = generator.generate_examples()
 

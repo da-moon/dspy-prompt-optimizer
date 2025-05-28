@@ -653,3 +653,13 @@ Every piece of code must meet these standards:
 - Use secure random generators for cryptographic operations
 
 Remember: **Quality over speed** - write it correctly the first time. When in doubt, be explicit rather than implicit. Every line of code should have a clear, single purpose and be easily testable.
+
+## Project-Specific CLI Information
+
+This project uses a subcommand-based CLI structure with the following commands:
+- `poetry run dspy-prompt-optimizer -- self` - Self-refinement optimization
+- `poetry run dspy-prompt-optimizer -- example` - Example-based optimization  
+- `poetry run dspy-prompt-optimizer -- metric` - Metric-based optimization
+- `poetry run dspy-prompt-optimizer -- generate-examples` - Generate examples for two-phase approach
+
+When creating documentation or examples, always use `poetry run dspy-prompt-optimizer -- [subcommand]` format.

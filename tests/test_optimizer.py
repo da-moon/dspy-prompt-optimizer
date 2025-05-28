@@ -4,7 +4,8 @@ from typing import Any
 import pytest
 
 import prompt_optimizer.optimizer.base as base_module
-import prompt_optimizer.optimizer.example_based as example_based_module
+import prompt_optimizer.optimizer.example_based.optimizer as example_based_optimizer_module
+import prompt_optimizer.optimizer.example_based.generator as example_generator_module
 import prompt_optimizer.optimizer.metric_based as metric_based_module
 import prompt_optimizer.optimizer.self_refinement as self_refinement_module
 from prompt_optimizer.optimizer import (
@@ -74,7 +75,8 @@ def mock_dspy(monkeypatch: Any) -> None:
     # Mock dspy in each individual module
     monkeypatch.setattr(base_module, "dspy", fake_dspy)
     monkeypatch.setattr(self_refinement_module, "dspy", fake_dspy)
-    monkeypatch.setattr(example_based_module, "dspy", fake_dspy)
+    monkeypatch.setattr(example_based_optimizer_module, "dspy", fake_dspy)
+    monkeypatch.setattr(example_generator_module, "dspy", fake_dspy)
     monkeypatch.setattr(metric_based_module, "dspy", fake_dspy)
 
     class FakeExampleGenerator:
@@ -85,7 +87,8 @@ def mock_dspy(monkeypatch: Any) -> None:
         def generate_examples(self) -> list[Any]:
             return [fake_dspy.Example(prompt="p", analysis="a", improved_prompt="i")]
 
-    monkeypatch.setattr(example_based_module, "ExampleGenerator", FakeExampleGenerator)
+    monkeypatch.setattr(example_generator_module, "ExampleGenerator", FakeExampleGenerator)
+    monkeypatch.setattr(example_based_optimizer_module, "ExampleGenerator", FakeExampleGenerator)
 
 
 def test_self_refinement_optimizer(mock_dspy: Any) -> None:

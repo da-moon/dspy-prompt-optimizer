@@ -1,10 +1,12 @@
 # CLAUDE.md - Project Context & Guidelines
 
-This file provides essential context for Claude Code to understand the project structure, coding standards, and workflow requirements.
+This file provides essential context for Claude Code to understand the project
+structure, coding standards, and workflow requirements.
 
 ## 🚀 Quick Start
 
 ### Environment Setup
+
 ```bash
 # Activate Python environment
 poetry shell
@@ -17,16 +19,17 @@ poetry run python main.py
 ```
 
 ### Essential Commands
+
 ```bash
 # Type checking & linting (in order)
 poetry run pyright --project pyrightconfig.strict.json .
 poetry run mypy .
-poetry run pylint .
+poetry run pylint -j`nproc` prompt_optimizer
 poetry run sourcery review --verbose --no-summary . | cat
 
 # Testing
-poetry run pytest
-poetry run pytest -xvs  # Stop on first failure with verbose output
+poetry run pytest .
+poetry run pytest -xvs .  # Stop on first failure with verbose output
 
 # Code formatting
 poetry run black .
@@ -53,6 +56,7 @@ Execute Python linters in this **exact order** and fix **ALL** issues:
 4. **sourcery** - Apply improvements where feasible
 
 **Critical Rules:**
+
 - ❌ NEVER use `# type: ignore` comments
 - ❌ NEVER add pylint disable comments without justification
 - ❌ NEVER skip type annotations or imports
@@ -60,6 +64,7 @@ Execute Python linters in this **exact order** and fix **ALL** issues:
 - ✅ Provide summary of fixes for each tool
 
 ### Git Workflow
+
 ```bash
 # Feature development
 git checkout -b feature/description
@@ -76,11 +81,13 @@ git commit -m "type(scope): description"  # conventional commits
 ### Architecture Principles
 
 #### 1. **Single Responsibility Principle (SRP)**
+
 - Each class/module has ONE reason to change
 - Each method has a clear, singular purpose
 - Files organized by feature, not technical layer
 
 #### 2. **Object-Oriented Best Practices**
+
 ```python
 # ✅ Good: Encapsulated class with clear responsibilities
 class PaymentProcessor:
@@ -100,6 +107,7 @@ class PaymentProcessor:
 #### 3. **Type Safety & Annotations**
 
 **MANDATORY Type Annotations:**
+
 - Variable annotations: `count: int = 0`
 - Function parameters: `def process(data: List[str]) -> None:`
 - Return types: Always annotate, use `-> None` for procedures
@@ -180,6 +188,7 @@ class DataProcessor:
 ### Code Organization
 
 #### Package Structure
+
 ```
 project/
 ├── src/
@@ -204,6 +213,7 @@ project/
 ```
 
 #### Module Organization
+
 - **Package-by-Feature**: Group related functionality together
 - **Layered Architecture**: Clear separation between layers
 - **Component-Based**: Reusable, self-contained components
@@ -241,6 +251,7 @@ class TestPaymentProcessor:
 ### Complexity Management
 
 #### Low Cyclomatic Complexity
+
 - Methods should have cyclomatic complexity ≤ 10
 - Break complex logic into smaller methods
 - Use early returns to reduce nesting
@@ -271,6 +282,7 @@ def _is_processable(self, order: Order) -> bool:
 ## 📋 Project-Specific Configuration
 
 ### Dependencies
+
 - Python version: 3.11+
 - Package manager: Poetry
 - Testing: pytest
@@ -279,6 +291,7 @@ def _is_processable(self, order: Order) -> bool:
 - Code analysis: sourcery
 
 ### Environment Variables
+
 ```bash
 DATABASE_URL=postgresql://...
 REDIS_URL=redis://...
@@ -286,6 +299,7 @@ LOG_LEVEL=INFO
 ```
 
 ### Common Issues & Solutions
+
 - **Import errors**: Ensure `PYTHONPATH` includes project root
 - **Type errors**: Run `poetry run mypy --install-types`
 - **Poetry issues**: Try `poetry lock --no-update`
@@ -293,12 +307,14 @@ LOG_LEVEL=INFO
 ## 🤖 Claude-Specific Instructions
 
 ### Response Style
+
 - Be concise and direct
 - Explain non-trivial commands before running
 - Ask before making structural changes
 - Commit only when explicitly requested
 
 ### Code Generation Rules
+
 1. Always use type annotations
 2. Include comprehensive error handling
 3. Add logging for important operations
@@ -306,6 +322,7 @@ LOG_LEVEL=INFO
 5. Follow PEP 8 and project conventions
 
 ### When Working on Tasks
+
 1. Read relevant files first without writing code
 2. Understand the full context
 3. Plan the approach
@@ -316,6 +333,7 @@ LOG_LEVEL=INFO
 ## 📚 Quick Reference
 
 ### Type Checking Commands
+
 ```bash
 # Strict type checking
 poetry run pyright --project pyrightconfig.strict.json .
@@ -326,6 +344,7 @@ poetry run mypy --install-types
 ```
 
 ### Debugging Commands
+
 ```bash
 # Run with debugger
 poetry run python -m pdb main.py
@@ -338,6 +357,7 @@ poetry run python -m memory_profiler main.py
 ```
 
 ### Documentation
+
 ```bash
 # Generate docs
 poetry run sphinx-build -b html docs docs/_build
@@ -347,5 +367,6 @@ poetry run python -m http.server --directory docs/_build
 ```
 
 ---
+
 **Remember**: Quality > Speed. Always ensure code passes ALL checks before
 proceeding.
