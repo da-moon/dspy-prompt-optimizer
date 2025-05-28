@@ -63,10 +63,27 @@ def main(
     max_tokens: int,
     verbose: bool,
 ) -> None:
-    """
-    Optimize a prompt using DSPy framework.
+    """Entry point for the command-line interface.
 
-    INPUT_PROMPT: File containing the prompt to optimize, or stdin if not specified.
+    Args:
+        input_prompt: File containing the prompt to optimize. Defaults to
+            ``stdin``.
+        output: File to write the optimized prompt. Defaults to ``stdout``.
+        model: Model used for optimization.
+        api_key: Anthropic API key.
+        optimization_type: Type of optimization to perform (``self``,
+            ``example``, or ``metric``).
+        max_iterations: Maximum number of iterations for metric-based
+            optimization.
+        max_tokens: Maximum token limit for LM generation.
+        verbose: Whether to print progress messages.
+
+    Returns:
+        None
+
+    Raises:
+        SystemExit: If the API key is missing or prompt optimization fails.
+        ValueError: If ``optimization_type`` is invalid.
     """
     if not api_key:
         click.echo(
