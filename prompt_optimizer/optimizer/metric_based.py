@@ -86,6 +86,11 @@ class MetricBasedOptimizer(PromptOptimizer):
 
         return score, evaluation.feedback
 
+    def _log_improved_prompt(self, candidate_score: int) -> None:
+        """Log improvement message if verbose."""
+        if self.verbose:
+            logger.info(f"Found better prompt with score: {candidate_score}")
+
     def _update_best_if_improved(
         self,
         candidate_prompt: str,
@@ -95,10 +100,23 @@ class MetricBasedOptimizer(PromptOptimizer):
     ) -> tuple[str, int]:
         """Update best prompt and score if candidate is better."""
         if candidate_score > best_score:
-            if self.verbose:
-                logger.info(f"Found better prompt with score: {candidate_score}")
+            self._log_improved_prompt(candidate_score)
             return candidate_prompt, candidate_score
         return best_prompt, best_score
+
+    def _generate_and_evaluate_candidate(
+        self,
+        generator: dspy.Predict,
+        evaluator: dspy.ChainOfThought,
+        best_prompt: str,
+        iteration: int,
+    ) -> tuple[str, int]:
+        """Generate and evaluate a candidate prompt."""
+        candidate_prompt: str = self._generate_prompt(generator, best_prompt)
+        candidate_score, _ = self._evaluate_and_log_prompt(
+            evaluator, candidate_prompt, f"Iteration {iteration + 1}"
+        )
+        return candidate_prompt, candidate_score
 
     def _process_optimization_iteration(
         self,
@@ -109,11 +127,9 @@ class MetricBasedOptimizer(PromptOptimizer):
         iteration: int,
     ) -> tuple[str, int]:
         """Process a single optimization iteration and return updated best prompt and score."""
-        candidate_prompt: str = self._generate_prompt(generator, best_prompt)
-        candidate_score, _ = self._evaluate_and_log_prompt(
-            evaluator, candidate_prompt, f"Iteration {iteration + 1}"
+        candidate_prompt, candidate_score = self._generate_and_evaluate_candidate(
+            generator, evaluator, best_prompt, iteration
         )
-
         return self._update_best_if_improved(
             candidate_prompt, candidate_score, best_prompt, best_score
         )
