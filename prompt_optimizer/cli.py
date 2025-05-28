@@ -3,11 +3,16 @@ Command-line interface for DSPy Prompt Optimizer.
 """
 
 import sys
-from typing import Optional, TextIO
+from typing import Final, Optional, TextIO
 
 import click
 
 from .optimizer import optimize_prompt
+
+DEFAULT_MODEL: Final[str] = "claude-sonnet-4-20250514"
+DEFAULT_OPTIMIZATION_TYPE: Final[str] = "self"
+DEFAULT_MAX_ITERATIONS: Final[int] = 3
+DEFAULT_MAX_TOKENS: Final[int] = 64000
 
 
 def _validate_parameters(
@@ -81,8 +86,8 @@ def _run_optimizer(
 @click.option(
     "--model",
     "-m",
-    default="claude-sonnet-4-20250514",
-    help="Model to use for optimization. Defaults to claude-sonnet-4-20250514.",
+    default=DEFAULT_MODEL,
+    help=f"Model to use for optimization. Defaults to {DEFAULT_MODEL}.",
 )
 @click.option(
     "--api-key",
@@ -94,21 +99,25 @@ def _run_optimizer(
     "--optimization-type",
     "-t",
     type=click.Choice(["self", "example", "metric"]),
-    default="self",
-    help="Type of optimization: self-refinement, example-based, or metric-based.",
+    default=DEFAULT_OPTIMIZATION_TYPE,
+    help=("Type of optimization: self-refinement, example-based, or metric-based."),
 )
 @click.option(
     "--max-iterations",
     "-i",
     type=int,
-    default=3,
-    help="Maximum number of iterations for metric-based optimization. Defaults to 3.",
+    default=DEFAULT_MAX_ITERATIONS,
+    help=(
+        f"Maximum number of iterations for metric-based optimization. Defaults to {DEFAULT_MAX_ITERATIONS}."
+    ),
 )
 @click.option(
     "--max-tokens",
     type=int,
-    default=64000,
-    help="Maximum number of tokens for LM generation. Defaults to 64000.",
+    default=DEFAULT_MAX_TOKENS,
+    help=(
+        f"Maximum number of tokens for LM generation. Defaults to {DEFAULT_MAX_TOKENS}."
+    ),
 )
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose output.")
 def main(
