@@ -27,8 +27,7 @@ class MetricBasedOptimizer(PromptOptimizer):
         """
         if self.verbose:
             logger.info(
-                f"Using metric-based optimization with {self.max_iterations} "
-                "max iterations"
+                f"Using metric-based optimization with {self.max_iterations} max iterations"
             )
 
         # Define a signature for prompt generation
@@ -78,9 +77,7 @@ class MetricBasedOptimizer(PromptOptimizer):
             candidate_score: int = int(candidate_evaluation.total_score)
 
             if self.verbose:
-                logger.info(
-                    f"Iteration {i + 1} score: {candidate_score}"
-                )
+                logger.info(f"Iteration {i + 1} score: {candidate_score}")
                 logger.info(f"Feedback: {candidate_evaluation.feedback}")
 
             # Keep the better prompt
