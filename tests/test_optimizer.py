@@ -1,17 +1,18 @@
 from types import SimpleNamespace
-import pytest
 from typing import Any
 
-from prompt_optimizer.optimizer import (
-    SelfRefinementOptimizer,
-    ExampleBasedOptimizer,
-    MetricBasedOptimizer,
-    optimize_prompt,
-)
+import pytest
+
 import prompt_optimizer.optimizer.base as base_module
-import prompt_optimizer.optimizer.self_refinement as self_refinement_module
 import prompt_optimizer.optimizer.example_based as example_based_module
 import prompt_optimizer.optimizer.metric_based as metric_based_module
+import prompt_optimizer.optimizer.self_refinement as self_refinement_module
+from prompt_optimizer.optimizer import (
+    ExampleBasedOptimizer,
+    MetricBasedOptimizer,
+    SelfRefinementOptimizer,
+    optimize_prompt,
+)
 
 
 @pytest.fixture
@@ -75,6 +76,16 @@ def mock_dspy(monkeypatch: Any) -> None:
     monkeypatch.setattr(self_refinement_module, "dspy", fake_dspy)
     monkeypatch.setattr(example_based_module, "dspy", fake_dspy)
     monkeypatch.setattr(metric_based_module, "dspy", fake_dspy)
+
+    class FakeExampleGenerator:
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            self.args = args
+            self.kwargs = kwargs
+
+        def generate_examples(self) -> list[Any]:
+            return [fake_dspy.Example(prompt="p", analysis="a", improved_prompt="i")]
+
+    monkeypatch.setattr(example_based_module, "ExampleGenerator", FakeExampleGenerator)
 
 
 def test_self_refinement_optimizer(mock_dspy: Any) -> None:

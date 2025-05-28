@@ -1,6 +1,7 @@
 """Minimal type stubs for dspy library - precisely typed based on actual usage."""
 
-from typing import Type, Protocol, runtime_checkable
+from typing import Protocol, Type, runtime_checkable
+
 from pydantic.fields import FieldInfo
 
 # Protocol for DSPy result objects that have dynamic attributes
