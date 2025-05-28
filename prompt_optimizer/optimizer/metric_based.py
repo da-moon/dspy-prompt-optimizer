@@ -1,6 +1,6 @@
-"""
-Metric-based prompt optimizer.
-"""
+"""Metric-based prompt optimizer."""
+
+from __future__ import annotations
 
 import logging
 from typing import Final
@@ -14,6 +14,19 @@ logger: Final[logging.Logger] = logging.getLogger(__name__)
 
 class MetricBasedOptimizer(PromptOptimizer):
     """Optimizer that uses metrics to improve prompts."""
+
+    def _evaluate_prompt(
+        self, evaluator: dspy.ChainOfThought, prompt: str
+    ) -> dspy.DSPyResult:
+        """Return the evaluator payload for ``prompt``."""
+
+        return evaluator(prompt=prompt)
+
+    def _generate_prompt(self, generator: dspy.Predict, prompt: str) -> str:
+        """Return a new prompt generated from ``prompt``."""
+
+        result = generator(original_prompt=prompt)
+        return result.improved_prompt
 
     def optimize(self, prompt_text: str) -> str:
         """
@@ -54,33 +67,25 @@ class MetricBasedOptimizer(PromptOptimizer):
         generator: dspy.Predict = dspy.Predict(PromptGenerator)
         evaluator: dspy.ChainOfThought = dspy.ChainOfThought(PromptEvaluator)
 
-        # Define the optimization loop
+        # Evaluate the original prompt
         best_prompt: str = prompt_text
-        best_score: int = 0
+        evaluation = self._evaluate_prompt(evaluator, best_prompt)
+        best_score: int = int(evaluation.total_score)
 
+        if self.verbose:
+            logger.info(f"Original prompt score: {best_score}")
+            logger.info(f"Feedback: {evaluation.feedback}")
+
+        # Define the optimization loop
         for i in range(self.max_iterations):
-            if i == 0:
-                # Evaluate the original prompt
-                evaluation = evaluator(prompt=best_prompt)
-                best_score = int(evaluation.total_score)
-
-                if self.verbose:
-                    logger.info(f"Original prompt score: {best_score}")
-                    logger.info(f"Feedback: {evaluation.feedback}")
-
-            # Generate an improved prompt
-            result = generator(original_prompt=best_prompt)
-            candidate_prompt: str = result.improved_prompt
-
-            # Evaluate the candidate prompt
-            candidate_evaluation = evaluator(prompt=candidate_prompt)
+            candidate_prompt: str = self._generate_prompt(generator, best_prompt)
+            candidate_evaluation = self._evaluate_prompt(evaluator, candidate_prompt)
             candidate_score: int = int(candidate_evaluation.total_score)
 
             if self.verbose:
                 logger.info(f"Iteration {i + 1} score: {candidate_score}")
                 logger.info(f"Feedback: {candidate_evaluation.feedback}")
 
-            # Keep the better prompt
             if candidate_score > best_score:
                 best_prompt = candidate_prompt
                 best_score = candidate_score
