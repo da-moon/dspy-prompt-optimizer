@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Optional, ParamSpec, TextIO, TypeVar
 
@@ -11,6 +12,20 @@ if TYPE_CHECKING:
 
 P = ParamSpec("P")
 R = TypeVar("R")
+
+
+@dataclass
+class ExampleOptimizerConfig:
+    """Configuration for creating an ExampleBasedOptimizer."""
+    model: str
+    api_key: str
+    max_tokens: int
+    verbose: bool
+    num_examples: int
+    examples_file: Path | None = None
+    example_generator_model: str | None = None
+    example_generator_api_key: str | None = None
+    example_generator_max_tokens: int | None = None
 
 
 def common_options(func: Callable[P, R]) -> Callable[P, R]:
@@ -137,28 +152,18 @@ def notify_examples_path(output_file: Path, verbose: bool) -> None:
         click.echo(str(output_file))
 
 
-def create_example_optimizer(
-    model: str,
-    api_key: str,
-    max_tokens: int,
-    verbose: bool,
-    num_examples: int,
-    examples_file: Path | None,
-    example_generator_model: str | None,
-    example_generator_api_key: str | None,
-    example_generator_max_tokens: int | None,
-) -> ExampleBasedOptimizer:
+def create_example_optimizer(config: ExampleOptimizerConfig) -> ExampleBasedOptimizer:
     """Return a configured :class:`ExampleBasedOptimizer`."""
     from ..optimizer.example_based import ExampleBasedOptimizer
 
     return ExampleBasedOptimizer(
-        model=model,
-        api_key=api_key,
-        max_tokens=max_tokens,
-        verbose=verbose,
-        num_examples=num_examples,
-        examples_file=examples_file,
-        example_generator_model=example_generator_model,
-        example_generator_api_key=example_generator_api_key,
-        example_generator_max_tokens=example_generator_max_tokens or max_tokens,
+        model=config.model,
+        api_key=config.api_key,
+        max_tokens=config.max_tokens,
+        verbose=config.verbose,
+        num_examples=config.num_examples,
+        examples_file=config.examples_file,
+        example_generator_model=config.example_generator_model,
+        example_generator_api_key=config.example_generator_api_key,
+        example_generator_max_tokens=config.example_generator_max_tokens or config.max_tokens,
     )

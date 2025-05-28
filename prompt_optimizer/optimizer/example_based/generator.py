@@ -111,15 +111,27 @@ class ExampleGenerator:
 
     def load_examples(self, path: Path) -> list[dspy.Example]:
         """Load examples from ``path``."""
+        raw_obj = self._load_json_file(path)
+        self._validate_json_structure(raw_obj, path)
+        raw_items = cast(list[dict[str, object]], raw_obj)
+        return self._create_examples_from_items(raw_items)
+
+    def _load_json_file(self, path: Path) -> object:
+        """Load and parse JSON file."""
         try:
-            raw_obj: object = json.loads(path.read_text(encoding="utf-8"))
+            return json.loads(path.read_text(encoding="utf-8"))
         except FileNotFoundError as exc:
             raise FileNotFoundError(f"File not found: {path}") from exc
         except json.JSONDecodeError as exc:
             raise ValueError(f"Invalid JSON in {path}: {exc}") from exc
+
+    def _validate_json_structure(self, raw_obj: object, _path: Path) -> None:
+        """Validate that JSON contains a list."""
         if not isinstance(raw_obj, list):
             raise ValueError(f"Invalid JSON format: expected list, got {type(raw_obj)}")
-        raw_items = cast(list[dict[str, object]], raw_obj)
+
+    def _create_examples_from_items(self, raw_items: list[dict[str, object]]) -> list[dspy.Example]:
+        """Create DSPy examples from raw JSON items."""
         return [
             dspy.Example(**{str(k): str(v) for k, v in item.items()})
             for item in raw_items

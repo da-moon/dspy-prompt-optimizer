@@ -49,14 +49,27 @@ def generate_examples_command(
     verbose: bool,
     output_file: Path,
 ) -> None:
-    """Generate optimization examples and save them to a file."""
+    """Generate examples for prompt optimization and save them to a file."""
+    _generate_and_save_examples(api_key, model, num_examples, max_tokens, verbose, output_file)
+
+
+def _generate_and_save_examples(
+    api_key: Optional[str],
+    model: str,
+    num_examples: int,
+    max_tokens: int,
+    verbose: bool,
+    output_file: Path,
+) -> None:
+    """Generate examples and save to file."""
     api = validate_api_key(api_key)
     echo_generation_start(num_examples, model, max_tokens, verbose)
-    ExampleGenerator(
+    generator = ExampleGenerator(
         model=model,
         api_key=api,
         num_examples=num_examples,
         max_tokens=max_tokens,
         verbose=verbose,
-    ).write_examples(output_file)
+    )
+    generator.write_examples(output_file)
     notify_examples_path(output_file, verbose)

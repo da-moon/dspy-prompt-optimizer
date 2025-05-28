@@ -85,11 +85,14 @@ class ExampleBasedOptimizer(PromptOptimizer):
         elif self.examples_file is not None:
             self._examples = _load_examples_from_file(self.examples_file)
         else:
+            example_max_tokens = self.example_generator_max_tokens or self.max_tokens
+            if self.verbose:
+                LOGGER.info("Generating examples with example_generator_max_tokens=%s", example_max_tokens)
             generator = ExampleGenerator(
                 model=self.example_generator_model or "claude-3-5-haiku-latest",
                 api_key=self.example_generator_api_key or self.api_key,
                 num_examples=self.num_examples,
-                max_tokens=self.example_generator_max_tokens or self.max_tokens,
+                max_tokens=example_max_tokens,
                 verbose=self.verbose,
             )
             self._examples = generator.generate_examples()
