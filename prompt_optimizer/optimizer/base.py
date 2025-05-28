@@ -2,8 +2,9 @@
 Base class for prompt optimization strategies.
 """
 
-import logging
 from dataclasses import dataclass, field
+import logging
+from typing import Final
 
 import dspy
 
@@ -12,7 +13,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
-logger = logging.getLogger(__name__)
+logger: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 @dataclass
