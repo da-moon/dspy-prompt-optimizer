@@ -2,17 +2,144 @@
 Command-line interface for DSPy Prompt Optimizer.
 """
 
+from __future__ import annotations
+
 import sys
+from pathlib import Path
 from typing import Final, Optional, TextIO
 
 import click
 
+from .example_generator import ExampleGenerator
 from .optimizer import optimize_prompt
 
 DEFAULT_MODEL: Final[str] = "claude-sonnet-4-20250514"
 DEFAULT_OPTIMIZATION_TYPE: Final[str] = "self"
 DEFAULT_MAX_ITERATIONS: Final[int] = 3
 DEFAULT_MAX_TOKENS: Final[int] = 64000
+DEFAULT_NUM_EXAMPLES: Final[int] = 5
+
+
+from typing import Any, Callable, TypeVar
+
+CommandFunc = TypeVar("CommandFunc", bound=Callable[..., Any])
+
+
+def common_options(command: CommandFunc) -> CommandFunc:
+    """Decorator to apply common optimization options."""
+
+    command = click.argument("input_prompt", type=click.File("r"), default=sys.stdin)(
+        command
+    )
+    command = click.option(
+        "--output",
+        "-o",
+        type=click.File("w"),
+        default=sys.stdout,
+        help="Output file for the optimized prompt. Defaults to stdout.",
+    )(command)
+    command = click.option(
+        "--model",
+        "-m",
+        default=DEFAULT_MODEL,
+        show_default=True,
+        help="Model to use for optimization.",
+    )(command)
+    command = click.option(
+        "--api-key",
+        "-k",
+        envvar="ANTHROPIC_API_KEY",
+        help="Anthropic API key. Can also be set via ANTHROPIC_API_KEY env variable.",
+    )(command)
+    command = click.option(
+        "--optimization-type",
+        "-t",
+        type=click.Choice(["self", "example", "metric"]),
+        default=DEFAULT_OPTIMIZATION_TYPE,
+        show_default=True,
+        help="Type of optimization: self-refinement, example-based, or metric-based.",
+    )(command)
+    command = click.option(
+        "--max-iterations",
+        "-i",
+        type=int,
+        default=DEFAULT_MAX_ITERATIONS,
+        show_default=True,
+        help="Maximum number of iterations for metric-based optimization.",
+    )(command)
+    command = click.option(
+        "--max-tokens",
+        type=int,
+        default=DEFAULT_MAX_TOKENS,
+        show_default=True,
+        help="Maximum number of tokens for LM generation.",
+    )(command)
+    command = click.option(
+        "--examples-file",
+        type=click.Path(path_type=Path),
+        help="JSON file containing optimization examples.",
+    )(command)
+    command = click.option(
+        "--num-examples",
+        type=int,
+        default=DEFAULT_NUM_EXAMPLES,
+        show_default=True,
+        help="Number of examples to generate if no file is provided.",
+    )(command)
+    command = click.option(
+        "--example-generator-model",
+        type=str,
+        default=DEFAULT_MODEL,
+        show_default=True,
+        help="Model for example generation.",
+    )(command)
+    command = click.option(
+        "--example-generator-api-key",
+        envvar="ANTHROPIC_API_KEY",
+        help="API key for example generation. Overrides ANTHROPIC_API_KEY if set.",
+    )(command)
+    command = click.option(
+        "--verbose", "-v", is_flag=True, help="Enable verbose output."
+    )(command)
+    return command
+
+
+@click.group(invoke_without_command=True)
+@common_options
+@click.pass_context
+def main(
+    ctx: click.Context,
+    input_prompt: TextIO,
+    output: TextIO,
+    *,
+    model: str,
+    api_key: Optional[str],
+    optimization_type: str,
+    max_iterations: int,
+    max_tokens: int,
+    examples_file: Optional[Path],
+    num_examples: int,
+    example_generator_model: str,
+    example_generator_api_key: Optional[str],
+    verbose: bool,
+) -> None:
+    """DSPy Prompt Optimizer command group."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(
+            optimize,
+            input_prompt=input_prompt,
+            output=output,
+            model=model,
+            api_key=api_key,
+            optimization_type=optimization_type,
+            max_iterations=max_iterations,
+            max_tokens=max_tokens,
+            examples_file=examples_file,
+            num_examples=num_examples,
+            example_generator_model=example_generator_model,
+            example_generator_api_key=example_generator_api_key,
+            verbose=verbose,
+        )
 
 
 def _validate_parameters(
@@ -74,53 +201,9 @@ def _run_optimizer(
     )
 
 
-@click.command()
-@click.argument("input_prompt", type=click.File("r"), default=sys.stdin)
-@click.option(
-    "--output",
-    "-o",
-    type=click.File("w"),
-    default=sys.stdout,
-    help="Output file for the optimized prompt. Defaults to stdout.",
-)
-@click.option(
-    "--model",
-    "-m",
-    default=DEFAULT_MODEL,
-    help=f"Model to use for optimization. Defaults to {DEFAULT_MODEL}.",
-)
-@click.option(
-    "--api-key",
-    "-k",
-    envvar="ANTHROPIC_API_KEY",
-    help="Anthropic API key. Can also be set via ANTHROPIC_API_KEY env variable.",
-)
-@click.option(
-    "--optimization-type",
-    "-t",
-    type=click.Choice(["self", "example", "metric"]),
-    default=DEFAULT_OPTIMIZATION_TYPE,
-    help=("Type of optimization: self-refinement, example-based, or metric-based."),
-)
-@click.option(
-    "--max-iterations",
-    "-i",
-    type=int,
-    default=DEFAULT_MAX_ITERATIONS,
-    help=(
-        f"Maximum number of iterations for metric-based optimization. Defaults to {DEFAULT_MAX_ITERATIONS}."
-    ),
-)
-@click.option(
-    "--max-tokens",
-    type=int,
-    default=DEFAULT_MAX_TOKENS,
-    help=(
-        f"Maximum number of tokens for LM generation. Defaults to {DEFAULT_MAX_TOKENS}."
-    ),
-)
-@click.option("--verbose", "-v", is_flag=True, help="Enable verbose output.")
-def main(
+@main.command(name="optimize")
+@common_options
+def optimize(
     input_prompt: TextIO,
     output: TextIO,
     *,
@@ -129,9 +212,13 @@ def main(
     optimization_type: str,
     max_iterations: int,
     max_tokens: int,
+    examples_file: Optional[Path],
+    num_examples: int,
+    example_generator_model: str,
+    example_generator_api_key: Optional[str],
     verbose: bool,
 ) -> None:
-    """Entry point for the command-line interface.
+    """Optimize a prompt using DSPy.
 
     Args:
         input_prompt: File containing the prompt to optimize. Defaults to
@@ -144,6 +231,11 @@ def main(
         max_iterations: Maximum number of iterations for metric-based
             optimization.
         max_tokens: Maximum token limit for LM generation.
+        examples_file: Path to a JSON file containing examples for optimization.
+        num_examples: Number of examples to generate when ``examples_file`` is
+            not provided.
+        example_generator_model: Model used for generating examples.
+        example_generator_api_key: API key for generating examples.
         verbose: Whether to print progress messages.
 
     Returns:
@@ -178,5 +270,45 @@ def main(
         sys.exit(1)
 
 
+@main.command(name="generate-examples")
+@click.option(
+    "--output-file",
+    "-o",
+    type=click.Path(path_type=Path),
+    required=True,
+    help="File path to write generated examples as JSON.",
+)
+@click.option(
+    "--num-examples",
+    type=int,
+    default=DEFAULT_NUM_EXAMPLES,
+    show_default=True,
+    help="Number of examples to generate.",
+)
+@click.option(
+    "--model",
+    "-m",
+    default=DEFAULT_MODEL,
+    show_default=True,
+    help="Model to use for example generation.",
+)
+@click.option(
+    "--api-key",
+    "-k",
+    envvar="ANTHROPIC_API_KEY",
+    help="Anthropic API key for example generation.",
+)
+def generate_examples(
+    *, output_file: Path, num_examples: int, model: str, api_key: Optional[str]
+) -> None:
+    """Generate optimization examples using :class:`ExampleGenerator`."""
+    try:
+        generator = ExampleGenerator(model=model, api_key=api_key or "")
+        generator.write_examples(num_examples, output_file)
+    except (ValueError, PermissionError, RuntimeError) as exc:
+        click.echo(f"Error generating examples: {exc}", err=True)
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    main()  # pylint: disable=missing-kwoa,no-value-for-parameter
+    main()

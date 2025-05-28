@@ -1,6 +1,6 @@
-"""Example generator for DSPy prompts."""
-
 from __future__ import annotations
+
+"""Example generator for DSPy prompts."""
 
 import json
 from dataclasses import dataclass, field
