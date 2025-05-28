@@ -28,3 +28,17 @@ def test_cli_max_tokens_flag() -> None:
     assert "Maximum number of tokens" in result.output
     # Check that the default value is shown
     assert "64000" in result.output
+
+
+def test_cli_missing_api_key() -> None:
+    runner = CliRunner()
+    result = runner.invoke(main, [], input="prompt")
+    assert result.exit_code == 1
+    assert "Anthropic API key is required" in result.output
+
+
+def test_cli_invalid_optimization_type() -> None:
+    runner = CliRunner()
+    result = runner.invoke(main, ["-t", "invalid", "-k", "k"], input="prompt")
+    assert result.exit_code == 2
+    assert "Invalid value for '--optimization-type'" in result.output
