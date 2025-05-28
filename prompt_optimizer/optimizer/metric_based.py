@@ -30,6 +30,7 @@ class MetricBasedOptimizer(PromptOptimizer):
 
     def _create_prompt_generator_signature(self) -> type[dspy.Signature]:
         """Create and return the PromptGenerator signature class."""
+
         class PromptGenerator(dspy.Signature):
             """Generate an improved prompt based on specific metrics."""
 
@@ -40,6 +41,7 @@ class MetricBasedOptimizer(PromptOptimizer):
 
     def _create_prompt_evaluator_signature(self) -> type[dspy.Signature]:
         """Create and return the PromptEvaluator signature class."""
+
         class PromptEvaluator(dspy.Signature):
             """Evaluate a prompt based on clarity, specificity, and actionability."""
 
@@ -58,10 +60,10 @@ class MetricBasedOptimizer(PromptOptimizer):
         """Set up and return the generator and evaluator modules."""
         generator_signature = self._create_prompt_generator_signature()
         evaluator_signature = self._create_prompt_evaluator_signature()
-        
+
         generator: dspy.Predict = dspy.Predict(generator_signature)
         evaluator: dspy.ChainOfThought = dspy.ChainOfThought(evaluator_signature)
-        
+
         return generator, evaluator
 
     def _log_initial_state(self) -> None:
@@ -71,19 +73,26 @@ class MetricBasedOptimizer(PromptOptimizer):
                 f"Using metric-based optimization with {self.max_iterations} max iterations"
             )
 
-    def _evaluate_and_log_prompt(self, evaluator: dspy.ChainOfThought, prompt: str, label: str) -> tuple[int, str]:
+    def _evaluate_and_log_prompt(
+        self, evaluator: dspy.ChainOfThought, prompt: str, label: str
+    ) -> tuple[int, str]:
         """Evaluate a prompt and log the results if verbose mode is enabled."""
         evaluation = self._evaluate_prompt(evaluator, prompt)
         score: int = int(evaluation.total_score)
-        
+
         if self.verbose:
             logger.info(f"{label} score: {score}")
             logger.info(f"Feedback: {evaluation.feedback}")
-            
+
         return score, evaluation.feedback
 
-    def _update_best_if_improved(self, candidate_prompt: str, candidate_score: int,
-                                best_prompt: str, best_score: int) -> tuple[str, int]:
+    def _update_best_if_improved(
+        self,
+        candidate_prompt: str,
+        candidate_score: int,
+        best_prompt: str,
+        best_score: int,
+    ) -> tuple[str, int]:
         """Update best prompt and score if candidate is better."""
         if candidate_score > best_score:
             if self.verbose:
@@ -91,18 +100,31 @@ class MetricBasedOptimizer(PromptOptimizer):
             return candidate_prompt, candidate_score
         return best_prompt, best_score
 
-    def _process_optimization_iteration(self, generator: dspy.Predict, evaluator: dspy.ChainOfThought,
-                                       best_prompt: str, best_score: int, iteration: int) -> tuple[str, int]:
+    def _process_optimization_iteration(
+        self,
+        generator: dspy.Predict,
+        evaluator: dspy.ChainOfThought,
+        best_prompt: str,
+        best_score: int,
+        iteration: int,
+    ) -> tuple[str, int]:
         """Process a single optimization iteration and return updated best prompt and score."""
         candidate_prompt: str = self._generate_prompt(generator, best_prompt)
         candidate_score, _ = self._evaluate_and_log_prompt(
             evaluator, candidate_prompt, f"Iteration {iteration + 1}"
         )
 
-        return self._update_best_if_improved(candidate_prompt, candidate_score, best_prompt, best_score)
+        return self._update_best_if_improved(
+            candidate_prompt, candidate_score, best_prompt, best_score
+        )
 
-    def _run_optimization_loop(self, generator: dspy.Predict, evaluator: dspy.ChainOfThought, 
-                              initial_prompt: str, initial_score: int) -> str:
+    def _run_optimization_loop(
+        self,
+        generator: dspy.Predict,
+        evaluator: dspy.ChainOfThought,
+        initial_prompt: str,
+        initial_score: int,
+    ) -> str:
         """Run the optimization loop and return the best prompt found."""
         best_prompt: str = initial_prompt
         best_score: int = initial_score
@@ -126,9 +148,11 @@ class MetricBasedOptimizer(PromptOptimizer):
         """
         self._log_initial_state()
         generator, evaluator = self._setup_modules()
-        
+
         initial_score, _ = self._evaluate_and_log_prompt(
             evaluator, prompt_text, "Original prompt"
         )
-        
-        return self._run_optimization_loop(generator, evaluator, prompt_text, initial_score)
+
+        return self._run_optimization_loop(
+            generator, evaluator, prompt_text, initial_score
+        )

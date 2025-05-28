@@ -1,4 +1,5 @@
 from click.testing import CliRunner
+
 from prompt_optimizer.cli import main
 
 
