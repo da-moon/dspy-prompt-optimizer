@@ -10,6 +10,65 @@ import click
 from .optimizer import optimize_prompt
 
 
+def _validate_parameters(
+    api_key: Optional[str], max_iterations: int, max_tokens: int, model: str
+) -> None:
+    """Validate CLI parameters."""
+    if not api_key:
+        raise ValueError(
+            "Anthropic API key is required. Provide it with --api-key or set ANTHROPIC_API_KEY."
+        )
+    if max_iterations <= 0:
+        raise ValueError("max_iterations must be positive")
+    if max_tokens <= 0:
+        raise ValueError("max_tokens must be positive")
+    if not model:
+        raise ValueError("model cannot be empty")
+
+
+def _read_prompt(input_prompt: TextIO) -> str:
+    """Read and validate the input prompt."""
+    try:
+        text = input_prompt.read()
+    except Exception as exc:  # noqa: BLE001
+        raise RuntimeError(f"Unexpected error reading input prompt: {exc}") from exc
+    text = text.strip()
+    if not text:
+        raise ValueError("Input prompt cannot be empty")
+    return text
+
+
+def _write_output(output: TextIO, prompt: str) -> None:
+    """Write the optimized prompt to the output file."""
+    try:
+        _ = output.write(prompt)
+    except PermissionError as exc:
+        raise PermissionError(f"Cannot write to output: {exc}") from exc
+    except Exception as exc:  # noqa: BLE001
+        raise RuntimeError(f"Unexpected error writing output: {exc}") from exc
+
+
+def _run_optimizer(
+    prompt_text: str,
+    model: str,
+    api_key: str,
+    optimization_type: str,
+    max_iterations: int,
+    max_tokens: int,
+    verbose: bool,
+) -> str:
+    """Wrapper to keep the main function concise."""
+    return optimize_prompt(
+        prompt_text=prompt_text,
+        model=model,
+        api_key=api_key,
+        optimization_type=optimization_type,
+        max_iterations=max_iterations,
+        max_tokens=max_tokens,
+        verbose=verbose,
+    )
+
+
 @click.command()
 @click.argument("input_prompt", type=click.File("r"), default=sys.stdin)
 @click.option(
@@ -85,42 +144,28 @@ def main(
         SystemExit: If the API key is missing or prompt optimization fails.
         ValueError: If ``optimization_type`` is invalid.
     """
-    if not api_key:
-        click.echo(
-            "Error: Anthropic API key is required. Provide it with --api-key or set ANTHROPIC_API_KEY environment variable.",
-            err=True,
-        )
-        sys.exit(1)
-
-    # Read the input prompt
-    prompt_text = input_prompt.read().strip()
-
-    if verbose:
-        click.echo(
-            f"Optimizing prompt using {optimization_type} approach with model {model} (max_tokens={max_tokens})...",
-            err=True,
-        )
-
-    # Optimize the prompt using DSPy
     try:
-        optimized_prompt = optimize_prompt(
-            prompt_text=prompt_text,
-            model=model,
-            api_key=api_key,
-            optimization_type=optimization_type,
-            max_iterations=max_iterations,
-            max_tokens=max_tokens,
-            verbose=verbose,
+        _validate_parameters(api_key, max_iterations, max_tokens, model)
+        prompt_text = _read_prompt(input_prompt)
+        if verbose:
+            click.echo(
+                f"Optimizing prompt using {optimization_type} approach with model {model} (max_tokens={max_tokens})...",
+                err=True,
+            )
+        optimized_prompt = _run_optimizer(
+            prompt_text,
+            model,
+            api_key or "",
+            optimization_type,
+            max_iterations,
+            max_tokens,
+            verbose,
         )
-
-        # Write the optimized prompt to the output
-        _ = output.write(optimized_prompt)
-
+        _write_output(output, optimized_prompt)
         if verbose:
             click.echo("Prompt optimization complete!", err=True)
-
-    except (ValueError, RuntimeError, KeyError) as e:
-        click.echo(f"Error during prompt optimization: {str(e)}", err=True)
+    except (ValueError, PermissionError, RuntimeError, KeyError) as exc:
+        click.echo(f"Error during prompt optimization: {exc}", err=True)
         sys.exit(1)
 
 
