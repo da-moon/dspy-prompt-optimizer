@@ -2,7 +2,8 @@
 DSPy Prompt Optimizer - A tool to optimize prompts using DSPy framework.
 """
 
-from .optimizer import optimize_prompt
+from typing import Final
 
-__version__ = "0.1.0"
-__all__ = ["optimize_prompt"]
+from .optimizer import optimize_prompt
+__version__: Final[str] = "0.1.0"
+__all__: Final[list[str]] = ["optimize_prompt"]

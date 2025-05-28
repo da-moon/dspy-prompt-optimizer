@@ -3,12 +3,13 @@ Metric-based prompt optimizer.
 """
 
 import logging
+from typing import Final
 
 import dspy
 
 from .base import PromptOptimizer
 
-logger = logging.getLogger(__name__)
+logger: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 class MetricBasedOptimizer(PromptOptimizer):
