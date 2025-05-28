@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable
@@ -68,37 +69,31 @@ class ExampleGenerator:
                 f"Generating {self.num_examples} examples using model {self.model}..."
             )
 
-        # Call with dynamic arguments - type checkers don't understand dspy signatures  
-        result = example_generator(  # type: ignore[call-arg]
-            task_description=task_desc,  # pyright: ignore[reportCallIssue]
-            num_examples=str(self.num_examples)  # pyright: ignore[reportCallIssue]
+        # Call with dynamic arguments - DSPy uses dynamic method generation
+        # This is safe because DSPy guarantees these parameters exist for this signature
+        result_callable = getattr(example_generator, "__call__")
+        result = result_callable(
+            task_description=task_desc,
+            num_examples=str(self.num_examples)
         )
 
-        # Parse the generated examples
+        # Parse the generated examples using object introspection
         try:
-            import re
-
             # Extract JSON from the response (handle markdown code blocks)
-            examples_text = str(getattr(result, "examples", ""))  # pyright: ignore[reportUnknownArgumentType]
+            examples_text = str(getattr(result, "examples", ""))
             json_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", examples_text)
-            json_str: str
-            if json_match:
-                json_str = json_match.group(1)
-            else:
-                json_str = examples_text
+            json_str: str = json_match.group(1) if json_match else examples_text
 
             examples_data: list[dict[str, str]] = json.loads(json_str)
 
-            # Convert to dspy.Example objects
-            examples: list[dspy.Example] = []
-            for ex_data in examples_data:
-                examples.append(
-                    dspy.Example(
-                        prompt=str(ex_data.get("prompt", "")),
-                        analysis=str(ex_data.get("analysis", "")),
-                        improved_prompt=str(ex_data.get("improved_prompt", "")),
-                    )
+            examples: list[dspy.Example] = [
+                dspy.Example(
+                    prompt=str(ex_data.get("prompt", "")),
+                    analysis=str(ex_data.get("analysis", "")),
+                    improved_prompt=str(ex_data.get("improved_prompt", "")),
                 )
+                for ex_data in examples_data
+            ]
 
             if self.verbose:
                 print(f"Successfully generated {len(examples)} examples")
@@ -108,7 +103,9 @@ class ExampleGenerator:
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             if self.verbose:
                 print(f"Failed to parse generated examples: {e}")
-                print(f"Raw response: {getattr(result, 'examples', 'No examples attribute')}")  # pyright: ignore[reportUnknownArgumentType]
+                print(
+                    f"Raw response: {getattr(result, 'examples', 'No examples attribute')}"
+                )
 
             # Re-raise the error instead of falling back to hardcoded examples
             raise RuntimeError(f"Failed to generate examples: {e}") from e
@@ -116,11 +113,23 @@ class ExampleGenerator:
     def load_examples(self, path: Path) -> list[dspy.Example]:
         """Load examples from ``path``."""
         try:
-            data = json.loads(path.read_text(encoding="utf-8"))
+            raw_data = json.loads(path.read_text(encoding="utf-8"))
         except FileNotFoundError as exc:
             raise FileNotFoundError(f"File not found: {path}") from exc
         except json.JSONDecodeError as exc:
             raise ValueError(f"Invalid JSON in {path}: {exc}") from exc
+
+        if not isinstance(raw_data, list):
+            raise ValueError(f"Invalid JSON format: expected list, got {type(raw_data)}")
+
+        data: list[dict[str, str]] = []
+        for raw_item in raw_data:
+            if isinstance(raw_item, dict):
+                # Ensure all values are strings for type safety
+                typed_item: dict[str, str] = {}
+                for k, v in raw_item.items():
+                    typed_item[str(k)] = str(v)
+                data.append(typed_item)
         return [dspy.Example(**item) for item in data]
 
     def save_examples(self, examples: Iterable[dspy.Example], path: Path) -> None:

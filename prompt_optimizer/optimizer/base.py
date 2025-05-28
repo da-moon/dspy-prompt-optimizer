@@ -13,7 +13,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
-logger: Final[logging.Logger] = logging.getLogger(__name__)
+LOGGER: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 @dataclass
@@ -62,8 +62,10 @@ class PromptOptimizer:
         dspy.configure(lm=self.lm)
 
         if self.verbose:
-            logger.info(
-                f"DSPy configured with model: {self.model} (max_tokens={self.max_tokens})"
+            LOGGER.info(
+                "DSPy configured with model: %s (max_tokens=%s)",
+                self.model,
+                self.max_tokens,
             )
 
     def optimize(self, prompt_text: str) -> str:

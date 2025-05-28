@@ -424,17 +424,74 @@ After making ANY code changes, run the following commands in this EXACT order:
    ```
    Fix ALL mypy errors before proceeding.
 
-3. **Code formatting with black**:
+3. **Code linting with pylint**:
+   ```bash
+   poetry run pylint -j`nproc` prompt_optimizer
+   ```
+   Fix issues unless they conflict with type checkers.
+
+4. **Code formatting with black**:
    ```bash
    poetry run black .
    ```
    This ensures consistent code formatting across the project.
+
+5. **Import sorting with isort**:
+   ```bash
+   poetry run isort .
+   ```
+   Ensures imports are properly organized.
 
 **IMPORTANT**: 
 - Never skip any of these steps
 - Fix all issues reported by pyright and mypy
 - Re-run the linters after fixes to ensure no regressions
 - Only consider code complete when all checks pass
+
+### Test Protocol for OpenAI Codex
+When working with OpenAI Codex (which lacks internet access), follow this modified protocol:
+
+1. **Type checking with pyright (strict mode)**:
+   ```bash
+   poetry run pyright --project pyrightconfig.strict.json .
+   ```
+   Fix ALL type errors before proceeding.
+
+2. **Type checking with mypy**:
+   ```bash
+   poetry run mypy .
+   ```
+   Fix ALL mypy errors before proceeding.
+
+3. **Code linting with pylint**:
+   ```bash
+   poetry run pylint -j`nproc` prompt_optimizer
+   ```
+   Fix issues unless they conflict with type checkers.
+
+4. **Code formatting with black**:
+   ```bash
+   poetry run black .
+   ```
+   This ensures consistent code formatting across the project.
+
+5. **Import sorting with isort**:
+   ```bash
+   poetry run isort .
+   ```
+   Ensures imports are properly organized.
+
+6. **Run unit tests**:
+   ```bash
+   poetry run pytest .
+   ```
+   Ensure all tests pass.
+
+**Note for OpenAI Codex**:
+- Skip sourcery analysis (requires internet access)
+- Skip e2e test script execution (requires internet access)
+- Focus on the core linting pipeline above
+- All other code quality requirements remain the same
 
 ### Code Quality Checklist (Must verify ALL items)
 Before considering any code complete, ensure:

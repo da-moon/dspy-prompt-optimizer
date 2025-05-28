@@ -1,7 +1,10 @@
 import json
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pytest import MonkeyPatch
 
 import pytest
 from click.testing import CliRunner
@@ -34,7 +37,7 @@ def test_cli_max_tokens_flag() -> None:
     assert "--max-tokens" in result.output
     assert "Maximum number of tokens" in result.output
     # Check that the default value is shown
-    assert "64000" in result.output
+    assert "8000" in result.output
 
 
 def test_cli_missing_api_key() -> None:
@@ -57,33 +60,33 @@ def test_cli_invalid_command() -> None:
 
 
 @pytest.fixture
-def mock_dspy_for_cli(monkeypatch: Any) -> None:
+def mock_dspy_for_cli(monkeypatch: "MonkeyPatch") -> None:
     """Mock dspy module for CLI tests."""
     
     class FakeChainOfThought:
-        def __init__(self, signature: Any) -> None:
+        def __init__(self, signature: object) -> None:
             self.signature = signature
 
-        def __call__(self, **kwargs: Any) -> SimpleNamespace:
+        def __call__(self, **kwargs: object) -> SimpleNamespace:
             return SimpleNamespace(
                 improved_prompt="Optimized: test prompt",
                 analysis="This prompt could be improved by adding more specificity.",
                 examples="[{\"prompt\": \"test\", \"analysis\": \"analysis\", \"improved_prompt\": \"improved\"}]"
             )
 
-    def mock_example(*_args: Any, **kwargs: Any) -> SimpleNamespace:
+    def mock_example(*_args: object, **kwargs: object) -> SimpleNamespace:
         return SimpleNamespace(**kwargs)
 
-    def mock_configure(**_kwargs: Any) -> None:
+    def mock_configure(**_kwargs: object) -> None:
         return None
 
-    def mock_lm(*_args: Any, **_kwargs: Any) -> None:
+    def mock_lm(*_args: object, **_kwargs: object) -> None:
         return None
 
-    def mock_input_field(*args: Any, **kwargs: Any) -> None:
+    def mock_input_field(*args: object, **kwargs: object) -> None:
         return None
     
-    def mock_output_field(*args: Any, **kwargs: Any) -> None:
+    def mock_output_field(*args: object, **kwargs: object) -> None:
         return None
     
     fake_dspy = SimpleNamespace(
@@ -107,7 +110,7 @@ def mock_dspy_for_cli(monkeypatch: Any) -> None:
     monkeypatch.setattr(example_generator_module, "dspy", fake_dspy)
 
 
-def test_example_oneshot_mode(mock_dspy_for_cli: Any) -> None:
+def test_example_oneshot_mode(mock_dspy_for_cli: None) -> None:
     """Test example-based optimization in oneshot mode (generate examples + optimize)."""
     runner = CliRunner()
     
@@ -130,7 +133,7 @@ def test_example_oneshot_mode(mock_dspy_for_cli: Any) -> None:
         assert "Prompt optimization complete!" in result.output
 
 
-def test_example_two_step_mode(mock_dspy_for_cli: Any) -> None:
+def test_example_two_step_mode(mock_dspy_for_cli: None) -> None:
     """Test example-based optimization in two-step mode (generate examples JSON then optimize)."""
     runner = CliRunner()
     
@@ -187,7 +190,7 @@ def test_example_two_step_mode(mock_dspy_for_cli: Any) -> None:
         assert "Prompt optimization complete!" in result.output
 
 
-def test_generate_examples_command(mock_dspy_for_cli: Any) -> None:
+def test_generate_examples_command(mock_dspy_for_cli: None) -> None:
     """Test the generate-examples command."""
     runner = CliRunner()
     

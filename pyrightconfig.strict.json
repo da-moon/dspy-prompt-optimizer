@@ -39,7 +39,7 @@
   "strictDictionaryInference": true,
   "strictSetInference": true,
   "strictParameterNoneValue": true,
-  "enableTypeIgnoreComments": true,
+  "enableTypeIgnoreComments": false,
   "autoSearchPaths": true,
   "indexing": true,
   "autoImportCompletions": true,

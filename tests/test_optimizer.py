@@ -1,5 +1,8 @@
 from types import SimpleNamespace
-from typing import Any
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pytest import MonkeyPatch
 
 import pytest
 
@@ -17,20 +20,20 @@ from prompt_optimizer.optimizer import (
 
 
 @pytest.fixture
-def mock_dspy(monkeypatch: Any) -> None:
+def mock_dspy(monkeypatch: "MonkeyPatch") -> None:
     class FakePredict:
-        def __init__(self, signature: Any) -> None:
+        def __init__(self, signature: object) -> None:
             self.signature = signature
 
-        def __call__(self, **kwargs: Any) -> SimpleNamespace:
+        def __call__(self, **kwargs: object) -> SimpleNamespace:
             return SimpleNamespace(improved_prompt="improved", analysis="analysis")
 
     class FakeChainOfThought(FakePredict):
-        def __init__(self, signature: Any) -> None:
+        def __init__(self, signature: object) -> None:
             super().__init__(signature)
             self.call_count = 0
 
-        def __call__(self, **kwargs: Any) -> SimpleNamespace:
+        def __call__(self, **kwargs: object) -> SimpleNamespace:
             self.call_count += 1
             # First call (evaluation of original) gets score 5, subsequent calls get score 15
             # This ensures the generated prompt is "better" than the original
@@ -45,20 +48,20 @@ def mock_dspy(monkeypatch: Any) -> None:
                 actionability_score="10",
             )
 
-    def mock_input_field(*_args: Any, **_kwargs: Any) -> None:
+    def mock_input_field(*_args: object, **_kwargs: object) -> None:
         return None
 
-    def mock_output_field(*_args: Any, **_kwargs: Any) -> None:
+    def mock_output_field(*_args: object, **_kwargs: object) -> None:
         return None
 
-    def mock_example(*_args: Any, **kwargs: Any) -> SimpleNamespace:
+    def mock_example(*_args: object, **kwargs: object) -> SimpleNamespace:
         # Return a SimpleNamespace with the provided keyword arguments
         return SimpleNamespace(**kwargs)
 
-    def mock_configure(**_kwargs: Any) -> None:
+    def mock_configure(**_kwargs: object) -> None:
         return None
 
-    def mock_lm(*_args: Any, **_kwargs: Any) -> None:
+    def mock_lm(*_args: object, **_kwargs: object) -> None:
         return None
 
     fake_dspy = SimpleNamespace(
@@ -80,30 +83,30 @@ def mock_dspy(monkeypatch: Any) -> None:
     monkeypatch.setattr(metric_based_module, "dspy", fake_dspy)
 
     class FakeExampleGenerator:
-        def __init__(self, *args: Any, **kwargs: Any) -> None:
+        def __init__(self, *args: object, **kwargs: object) -> None:
             self.args = args
             self.kwargs = kwargs
 
-        def generate_examples(self) -> list[Any]:
+        def generate_examples(self) -> list[SimpleNamespace]:
             return [fake_dspy.Example(prompt="p", analysis="a", improved_prompt="i")]
 
     monkeypatch.setattr(example_generator_module, "ExampleGenerator", FakeExampleGenerator)
     monkeypatch.setattr(example_based_optimizer_module, "ExampleGenerator", FakeExampleGenerator)
 
 
-def test_self_refinement_optimizer(mock_dspy: Any) -> None:
+def test_self_refinement_optimizer(mock_dspy: None) -> None:
     opt = SelfRefinementOptimizer(model="m", api_key="k", max_tokens=64000)
     result = opt.optimize("prompt")
     assert result == "improved"
 
 
-def test_example_based_optimizer(mock_dspy: Any) -> None:
+def test_example_based_optimizer(mock_dspy: None) -> None:
     opt = ExampleBasedOptimizer(model="m", api_key="k", max_tokens=64000)
     result = opt.optimize("prompt")
     assert result == "improved"
 
 
-def test_example_based_optimizer_dspy_compatibility(mock_dspy: Any) -> None:
+def test_example_based_optimizer_dspy_compatibility(mock_dspy: None) -> None:
     """Test that example-based optimizer doesn't use non-existent DSPy methods."""
     opt = ExampleBasedOptimizer(model="m", api_key="k", max_tokens=64000)
 
@@ -117,13 +120,13 @@ def test_example_based_optimizer_dspy_compatibility(mock_dspy: Any) -> None:
     # AttributeError: 'ChainOfThought' object has no attribute 'update_demos'
 
 
-def test_metric_based_optimizer(mock_dspy: Any) -> None:
+def test_metric_based_optimizer(mock_dspy: None) -> None:
     opt = MetricBasedOptimizer(model="m", api_key="k", max_tokens=64000)
     result = opt.optimize("prompt")
     assert result == "improved"
 
 
-def test_metric_based_optimizer_with_custom_iterations(mock_dspy: Any) -> None:
+def test_metric_based_optimizer_with_custom_iterations(mock_dspy: None) -> None:
     opt = MetricBasedOptimizer(
         model="m", api_key="k", max_iterations=5, max_tokens=64000
     )
@@ -132,7 +135,7 @@ def test_metric_based_optimizer_with_custom_iterations(mock_dspy: Any) -> None:
     assert result == "improved"
 
 
-def test_optimize_prompt_function(mock_dspy: Any) -> None:
+def test_optimize_prompt_function(mock_dspy: None) -> None:
     """Test the convenience function for each optimization type."""
     # Test self-refinement (default)
     result = optimize_prompt(

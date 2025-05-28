@@ -35,10 +35,6 @@ poetry run pytest -xvs .  # Stop on first failure with verbose output
 poetry run black .
 poetry run isort .
 
-# Pre-commit hooks
-pre-commit install
-pre-commit run --all-files
-
 # Build & Deploy
 poetry build
 poetry publish --dry-run
@@ -54,10 +50,14 @@ Execute Python linters in this **exact order** and fix **ALL** issues:
 2. **mypy** - MUST fix all type checking issues
 3. **pylint** - Fix unless conflicts with type checkers
 4. **sourcery** - Apply improvements where feasible
+5. **e2e tests** - Run e2e tests for commands by running `scripts/e2e_test.sh`
+   ; if needed , update it and add coverage for subcommands that don't have
+   coverage
 
 **Critical Rules:**
 
 - ❌ NEVER use `# type: ignore` comments
+- ❌ NEVER use `# pyright: ignore` comments
 - ❌ NEVER add pylint disable comments without justification
 - ❌ NEVER skip type annotations or imports
 - ✅ Re-run each linter after fixes to ensure no regressions

@@ -6,14 +6,14 @@ import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Final, cast, Any
+from typing import Final, cast
 
 import dspy
 
 from .generator import ExampleGenerator
 from ..base import PromptOptimizer
 
-logger: Final[logging.Logger] = logging.getLogger(__name__)
+LOGGER: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 # Removed hardcoded examples - all examples are now generated dynamically
@@ -24,7 +24,7 @@ def _load_examples_from_file(path: Path) -> list[dspy.Example]:
 
     try:
         content = path.read_text(encoding="utf-8")
-    except Exception as exc:  # noqa: BLE001
+    except (OSError, IOError, PermissionError) as exc:
         raise RuntimeError(f"Unexpected error reading {path}: {exc}") from exc
 
     try:
@@ -35,19 +35,16 @@ def _load_examples_from_file(path: Path) -> list[dspy.Example]:
     if not isinstance(raw_data, list):
         raise ValueError("Examples file must contain a list of objects")
 
-    # raw_data is confirmed to be a list, but we need to validate it's the right type  
-    raw_examples: list[Any] = raw_data  # pyright: ignore[reportUnknownVariableType]
+    # raw_data is confirmed to be a list, but we need to validate it's the right type
+    raw_examples: list[dict[str, object]] = cast(list[dict[str, object]], raw_data)
 
     examples: list[dspy.Example] = []
     for item in raw_examples:
-        if not isinstance(item, dict):
-            raise ValueError("Each example entry must be an object")
-        entry: dict[str, Any] = cast(dict[str, Any], item)
         examples.append(
             dspy.Example(
-                prompt=str(entry.get("prompt", "")),
-                analysis=str(entry.get("analysis", "")),
-                improved_prompt=str(entry.get("improved_prompt", "")),
+                prompt=str(item.get("prompt", "")),
+                analysis=str(item.get("analysis", "")),
+                improved_prompt=str(item.get("improved_prompt", "")),
             )
         )
 
@@ -108,7 +105,7 @@ class ExampleBasedOptimizer(PromptOptimizer):
             The optimized prompt text
         """
         if self.verbose:
-            logger.info("Using example-based optimization approach")
+            LOGGER.info("Using example-based optimization approach")
 
         # Define a signature for prompt refinement with examples
         class ExamplePromptRefiner(dspy.Signature):
@@ -134,6 +131,6 @@ class ExampleBasedOptimizer(PromptOptimizer):
         refinement_payload = refiner(prompt=prompt_text, examples=examples_text)
 
         if self.verbose:
-            logger.info(f"Analysis: {refinement_payload.analysis}")
+            LOGGER.info("Analysis: %s", refinement_payload.analysis)
 
         return refinement_payload.improved_prompt

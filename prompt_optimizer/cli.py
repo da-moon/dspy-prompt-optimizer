@@ -4,7 +4,7 @@ Command-line interface for DSPy Prompt Optimizer.
 
 import sys
 from pathlib import Path
-from typing import Any, Callable, Optional, TextIO, TypeVar
+from typing import Callable, Optional, TextIO, TypeVar, ParamSpec
 
 import click
 
@@ -14,10 +14,11 @@ from .optimizer.self_refinement import SelfRefinementOptimizer
 
 
 # Common options for all subcommands
-F = TypeVar('F', bound=Callable[..., Any])
+P = ParamSpec('P')
+R = TypeVar('R')
 
 
-def common_options(func: F) -> F:
+def common_options(func: Callable[P, R]) -> Callable[P, R]:
     """Decorator to add common options to all subcommands."""
     func = click.option("--verbose", "-v", is_flag=True, help="Enable verbose output.")(func)
     func = click.option(
@@ -50,7 +51,7 @@ def common_options(func: F) -> F:
 
 
 # Common options for example-based operations
-def example_options(func: F) -> F:
+def example_options(func: Callable[P, R]) -> Callable[P, R]:
     """Decorator to add example-specific options."""
     func = click.option(
         "--num-examples",
@@ -110,10 +111,7 @@ def _write_output_with_logging(output: TextIO, result: str, verbose: bool) -> No
 
 @click.group()
 def main() -> None:
-    """
-    DSPy Prompt Optimizer - Optimize prompts using different strategies.
-    """
-    pass
+    """DSPy Prompt Optimizer - Optimize prompts using different strategies."""
 
 
 @main.command()
@@ -188,6 +186,11 @@ def example(
             f"Optimizing prompt using example-based approach with model {model} (max_tokens={max_tokens})...",
             err=True,
         )
+        if example_generator_max_tokens and example_generator_max_tokens != max_tokens:
+            click.echo(
+                f"Using separate max tokens for example generator: example_generator_max_tokens={example_generator_max_tokens}",
+                err=True,
+            )
 
     try:
         # Direct instantiation - proper OOP
@@ -340,4 +343,4 @@ def generate_examples(
 
 
 if __name__ == "__main__":
-    _ = main()  # pylint: disable=missing-kwoa,no-value-for-parameter
+    main()
