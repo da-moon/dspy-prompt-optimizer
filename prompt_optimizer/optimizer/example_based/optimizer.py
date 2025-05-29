@@ -91,31 +91,36 @@ class ExampleBasedOptimizer(PromptOptimizer, OptimizationStrategy):
         self.example_generator_api_key = config.example_generator_api_key
         self.example_generator_max_tokens = config.example_generator_max_tokens
         self.num_examples = config.num_examples
-        self.__post_init__()
+        self._examples = self._initialize_examples()
 
-    def __post_init__(self) -> None:  # noqa: D401
-        """Initialize optimizer and prepare examples."""
-        super().__post_init__()
-
+    def _initialize_examples(self) -> list[dspy.Example]:
+        """Initialize examples from config or generate them."""
         if self.examples is not None:
-            self._examples = self.examples
-        elif self.examples_file is not None:
-            self._examples = _load_examples_from_file(self.examples_file)
-        else:
-            example_max_tokens = self.example_generator_max_tokens or self.max_tokens
-            if self.verbose:
-                LOGGER.info(
-                    "Generating examples with example_generator_max_tokens=%s",
-                    example_max_tokens,
-                )
-            generator = ExampleGenerator(
-                model=self.example_generator_model or "claude-3-5-haiku-latest",
-                api_key=self.example_generator_api_key or self.api_key,
-                num_examples=self.num_examples,
-                max_tokens=example_max_tokens,
-                verbose=self.verbose,
+            return self.examples
+
+        if self.examples_file is not None:
+            return _load_examples_from_file(self.examples_file)
+
+        return self._generate_examples()
+
+    def _generate_examples(self) -> list[dspy.Example]:
+        """Generate examples using the example generator."""
+        example_max_tokens = self.example_generator_max_tokens or self.max_tokens
+
+        if self.verbose:
+            LOGGER.info(
+                "Generating examples with example_generator_max_tokens=%s",
+                example_max_tokens,
             )
-            self._examples = generator.generate_examples()
+
+        generator = ExampleGenerator(
+            model=self.example_generator_model or "claude-3-5-haiku-latest",
+            api_key=self.example_generator_api_key or self.api_key,
+            num_examples=self.num_examples,
+            max_tokens=example_max_tokens,
+            verbose=self.verbose,
+        )
+        return generator.generate_examples()
 
     def optimize(self, prompt_text: str) -> str:
         """

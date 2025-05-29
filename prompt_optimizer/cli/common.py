@@ -7,9 +7,10 @@ from typing import TYPE_CHECKING, Callable, Optional, ParamSpec, TextIO, TypeVar
 
 import click
 
+from ..optimizer.strategies import ExampleBasedConfig
+
 if TYPE_CHECKING:
     from ..optimizer.example_based import ExampleBasedOptimizer
-from ..optimizer.strategies import ExampleBasedConfig
 
 P = ParamSpec("P")
 R = TypeVar("R")
