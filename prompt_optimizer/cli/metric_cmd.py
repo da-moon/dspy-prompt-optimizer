@@ -76,9 +76,7 @@ def _create_metric_config(
     )
 
 
-def _execute_metric_optimization(
-    config: MetricBasedConfig, prompt_text: str
-) -> str:
+def _execute_metric_optimization(config: MetricBasedConfig, prompt_text: str) -> str:
     """Execute the optimization using the provided configuration."""
     optimizer = MetricBasedOptimizer(config)
     return optimizer.optimize(prompt_text)

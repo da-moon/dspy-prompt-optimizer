@@ -20,6 +20,7 @@ def optimize_prompt(prompt_text: str, strategy: OptimizationStrategy) -> str:
     """Optimize ``prompt_text`` using ``strategy``."""
     return strategy.optimize(prompt_text)
 
+
 __all__: Final[list[str]] = [
     "PromptOptimizer",
     "SelfRefinementOptimizer",

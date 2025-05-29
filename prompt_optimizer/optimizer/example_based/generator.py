@@ -40,51 +40,56 @@ class ExampleGenerator:
 
     def generate_examples(self) -> list[dspy.Example]:
         """Generate prompt improvement examples using the LLM."""
+        module = self._build_generation_module()
+        task_desc = self._create_task_description()
+        if self.verbose:
+            print(
+                f"Generating {self.num_examples} examples using model {self.model}..."
+            )
+        result_callable = getattr(module, "__call__")
+        result = result_callable(
+            task_description=task_desc, num_examples=str(self.num_examples)
+        )
+        examples_text = str(getattr(result, "examples", ""))
+        return self._parse_response(examples_text)
 
-        # Define a signature for generating prompt optimization examples
+    def _build_generation_module(self) -> dspy.ChainOfThought:
+        """Create the dspy module used for example generation."""
+
         class ExampleGeneratorSignature(dspy.Signature):
-            """Generate examples of prompt optimization."""
+            """Signature defining the example generation interface."""
 
             task_description = dspy.InputField(
                 desc="Description of the task for generating examples"
             )
             num_examples = dspy.InputField(desc="Number of examples to generate")
             examples = dspy.OutputField(
-                desc="List of prompt optimization examples in JSON format with fields: prompt, analysis, improved_prompt"
+                desc=(
+                    "List of prompt optimization examples in JSON format with "
+                    "fields: prompt, analysis, improved_prompt"
+                )
             )
 
-        # Create the example generation module
-        example_generator = dspy.ChainOfThought(ExampleGeneratorSignature)
+        return dspy.ChainOfThought(ExampleGeneratorSignature)
 
-        # Generate examples
-        task_desc = (
-            "Generate diverse examples of prompt optimization showing how to improve "
-            "vague, unclear, or poorly structured prompts. Each example should demonstrate "
-            "common prompt improvement techniques like adding specificity, context, "
-            "constraints, output format requirements, or role clarification."
+    def _create_task_description(self) -> str:
+        """Return the text description for the generation task."""
+        return (
+            "Generate diverse examples of prompt optimization showing how to "
+            "improve vague, unclear, or poorly structured prompts. Each example "
+            "should demonstrate common prompt improvement techniques like adding "
+            "specificity, context, constraints, output format requirements, or "
+            "role clarification."
         )
 
-        if self.verbose:
-            print(
-                f"Generating {self.num_examples} examples using model {self.model}..."
-            )
-
-        # Call with dynamic arguments - DSPy uses dynamic method generation
-        # This is safe because DSPy guarantees these parameters exist for this signature
-        result_callable = getattr(example_generator, "__call__")
-        result = result_callable(
-            task_description=task_desc, num_examples=str(self.num_examples)
-        )
-
-        # Parse the generated examples using object introspection
+    def _parse_response(self, text: str) -> list[dspy.Example]:
+        """Parse `text` from the model into DSPy examples."""
+        if not text:
+            raise ValueError("Response text must be a non-empty string")
         try:
-            # Extract JSON from the response (handle markdown code blocks)
-            examples_text = str(getattr(result, "examples", ""))
-            json_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", examples_text)
-            json_str: str = json_match.group(1) if json_match else examples_text
-
+            json_match = re.search(r"```(?:json)?\\s*([\\s\\S]*?)\\s*```", text)
+            json_str: str = json_match.group(1) if json_match else text
             examples_data: list[dict[str, str]] = json.loads(json_str)
-
             examples: list[dspy.Example] = [
                 dspy.Example(
                     prompt=str(ex_data.get("prompt", "")),
@@ -93,21 +98,14 @@ class ExampleGenerator:
                 )
                 for ex_data in examples_data
             ]
-
             if self.verbose:
                 print(f"Successfully generated {len(examples)} examples")
-
             return examples
-
-        except (json.JSONDecodeError, KeyError, TypeError) as e:
+        except (json.JSONDecodeError, KeyError, TypeError) as exc:
             if self.verbose:
-                print(f"Failed to parse generated examples: {e}")
-                print(
-                    f"Raw response: {getattr(result, 'examples', 'No examples attribute')}"
-                )
-
-            # Re-raise the error instead of falling back to hardcoded examples
-            raise RuntimeError(f"Failed to generate examples: {e}") from e
+                print(f"Failed to parse generated examples: {exc}")
+                print(f"Raw response: {text}")
+            raise RuntimeError(f"Failed to generate examples: {exc}") from exc
 
     def load_examples(self, path: Path) -> list[dspy.Example]:
         """Load examples from ``path``."""
