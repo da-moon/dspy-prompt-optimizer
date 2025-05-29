@@ -25,7 +25,7 @@ def _load_examples_from_file(path: Path) -> list[dspy.Example]:
 
     try:
         content = path.read_text(encoding="utf-8")
-    except (OSError, IOError, PermissionError) as exc:
+    except (OSError, IOError) as exc:
         raise RuntimeError(f"Unexpected error reading {path}: {exc}") from exc
 
     try:
@@ -39,16 +39,14 @@ def _load_examples_from_file(path: Path) -> list[dspy.Example]:
     # raw_data is confirmed to be a list, but we need to validate it's the right type
     raw_examples: list[dict[str, object]] = cast(list[dict[str, object]], raw_data)
 
-    examples: list[dspy.Example] = []
-    for item in raw_examples:
-        examples.append(
-            dspy.Example(
-                prompt=str(item.get("prompt", "")),
-                analysis=str(item.get("analysis", "")),
-                improved_prompt=str(item.get("improved_prompt", "")),
-            )
+    examples: list[dspy.Example] = [
+        dspy.Example(
+            prompt=str(item.get("prompt", "")),
+            analysis=str(item.get("analysis", "")),
+            improved_prompt=str(item.get("improved_prompt", "")),
         )
-
+        for item in raw_examples
+    ]
     return examples
 
 
