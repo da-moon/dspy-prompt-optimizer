@@ -40,18 +40,26 @@ class ExampleGenerator:
 
     def generate_examples(self) -> list[dspy.Example]:
         """Generate prompt improvement examples using the LLM."""
-        module = self._build_generation_module()
+        example_generator = self._build_generation_module()
         task_desc = self._create_task_description()
+        self._log_generation_start()
+        examples_text = self._generate_examples_text(example_generator, task_desc)
+        return self._parse_response(examples_text)
+
+    def _log_generation_start(self) -> None:
+        """Log the start of example generation."""
         if self.verbose:
             print(
                 f"Generating {self.num_examples} examples using model {self.model}..."
             )
-        result_callable = getattr(module, "__call__")
+
+    def _generate_examples_text(self, example_generator: dspy.ChainOfThought, task_desc: str) -> str:
+        """Generate examples text using the LLM."""
+        result_callable = getattr(example_generator, "__call__")
         result = result_callable(
             task_description=task_desc, num_examples=str(self.num_examples)
         )
-        examples_text = str(getattr(result, "examples", ""))
-        return self._parse_response(examples_text)
+        return str(getattr(result, "examples", ""))
 
     def _build_generation_module(self) -> dspy.ChainOfThought:
         """Create the dspy module used for example generation."""
@@ -87,25 +95,41 @@ class ExampleGenerator:
         if not text:
             raise ValueError("Response text must be a non-empty string")
         try:
-            json_match = re.search(r"```(?:json)?\\s*([\\s\\S]*?)\\s*```", text)
-            json_str: str = json_match.group(1) if json_match else text
+            json_str = self._extract_json_from_text(text)
             examples_data: list[dict[str, str]] = json.loads(json_str)
-            examples: list[dspy.Example] = [
-                dspy.Example(
-                    prompt=str(ex_data.get("prompt", "")),
-                    analysis=str(ex_data.get("analysis", "")),
-                    improved_prompt=str(ex_data.get("improved_prompt", "")),
-                )
-                for ex_data in examples_data
-            ]
-            if self.verbose:
-                print(f"Successfully generated {len(examples)} examples")
+            examples = self._convert_to_examples(examples_data)
+            self._log_success(examples)
             return examples
         except (json.JSONDecodeError, KeyError, TypeError) as exc:
-            if self.verbose:
-                print(f"Failed to parse generated examples: {exc}")
-                print(f"Raw response: {text}")
+            self._log_error(exc, text)
             raise RuntimeError(f"Failed to generate examples: {exc}") from exc
+
+    def _extract_json_from_text(self, text: str) -> str:
+        """Extract JSON string from text, handling markdown code blocks."""
+        json_match = re.search(r"```(?:json)?\s*([^`]*?)\s*```", text)
+        return json_match[1] if json_match else text
+
+    def _convert_to_examples(self, examples_data: list[dict[str, str]]) -> list[dspy.Example]:
+        """Convert raw data to DSPy examples."""
+        return [
+            dspy.Example(
+                prompt=str(ex_data.get("prompt", "")),
+                analysis=str(ex_data.get("analysis", "")),
+                improved_prompt=str(ex_data.get("improved_prompt", "")),
+            )
+            for ex_data in examples_data
+        ]
+
+    def _log_success(self, examples: list[dspy.Example]) -> None:
+        """Log successful example generation."""
+        if self.verbose:
+            print(f"Successfully generated {len(examples)} examples")
+
+    def _log_error(self, exc: Exception, text: str) -> None:
+        """Log error during example parsing."""
+        if self.verbose:
+            print(f"Failed to parse generated examples: {exc}")
+            print(f"Raw response: {text}")
 
     def load_examples(self, path: Path) -> list[dspy.Example]:
         """Load examples from ``path``."""
