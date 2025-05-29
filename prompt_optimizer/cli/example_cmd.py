@@ -35,9 +35,17 @@ def example_command(
 ) -> None:
     """Optimize a prompt using example-based approach."""
     _run_optimization(
-        input_prompt, output, model, api_key, max_tokens, verbose,
-        num_examples, example_generator_model, example_generator_api_key,
-        example_generator_max_tokens, examples_file
+        input_prompt,
+        output,
+        model,
+        api_key,
+        max_tokens,
+        verbose,
+        num_examples,
+        example_generator_model,
+        example_generator_api_key,
+        example_generator_max_tokens,
+        examples_file,
     )
 
 

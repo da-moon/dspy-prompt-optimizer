@@ -130,7 +130,9 @@ class ExampleGenerator:
         if not isinstance(raw_obj, list):
             raise ValueError(f"Invalid JSON format: expected list, got {type(raw_obj)}")
 
-    def _create_examples_from_items(self, raw_items: list[dict[str, object]]) -> list[dspy.Example]:
+    def _create_examples_from_items(
+        self, raw_items: list[dict[str, object]]
+    ) -> list[dspy.Example]:
         """Create DSPy examples from raw JSON items."""
         return [
             dspy.Example(**{str(k): str(v) for k, v in item.items()})

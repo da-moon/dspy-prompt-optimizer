@@ -8,12 +8,22 @@ from typing import Final
 import dspy
 
 from .base import PromptOptimizer
+from .strategies import OptimizationStrategy, SelfRefinementConfig
 
 LOGGER: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-class SelfRefinementOptimizer(PromptOptimizer):
+class SelfRefinementOptimizer(PromptOptimizer, OptimizationStrategy):
     """Optimizer that uses self-refinement to improve prompts."""
+
+    def __init__(self, config: SelfRefinementConfig) -> None:
+        """Initialize the optimizer with ``config``."""
+        super().__init__(
+            model=config.model,
+            api_key=config.api_key,
+            max_tokens=config.max_tokens,
+            verbose=config.verbose,
+        )
 
     def optimize(self, prompt_text: str) -> str:
         """

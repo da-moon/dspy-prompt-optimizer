@@ -11,6 +11,7 @@ from typing import Final, cast
 import dspy
 
 from ..base import PromptOptimizer
+from ..strategies import ExampleBasedConfig, OptimizationStrategy
 from .generator import ExampleGenerator
 
 LOGGER: Final[logging.Logger] = logging.getLogger(__name__)
@@ -64,8 +65,8 @@ def _format_examples(examples: list[dspy.Example]) -> str:
     )
 
 
-@dataclass
-class ExampleBasedOptimizer(PromptOptimizer):
+@dataclass(init=False)
+class ExampleBasedOptimizer(PromptOptimizer, OptimizationStrategy):
     """Optimizer that uses examples to improve prompts."""
 
     examples: list[dspy.Example] | None = None
@@ -75,6 +76,22 @@ class ExampleBasedOptimizer(PromptOptimizer):
     example_generator_max_tokens: int | None = None
     num_examples: int = 3
     _examples: list[dspy.Example] = field(init=False)
+
+    def __init__(self, config: ExampleBasedConfig) -> None:
+        """Initialize the optimizer using ``config``."""
+        super().__init__(
+            model=config.model,
+            api_key=config.api_key,
+            max_tokens=config.max_tokens,
+            verbose=config.verbose,
+        )
+        self.examples = config.examples
+        self.examples_file = config.examples_file
+        self.example_generator_model = config.example_generator_model
+        self.example_generator_api_key = config.example_generator_api_key
+        self.example_generator_max_tokens = config.example_generator_max_tokens
+        self.num_examples = config.num_examples
+        self.__post_init__()
 
     def __post_init__(self) -> None:  # noqa: D401
         """Initialize optimizer and prepare examples."""
@@ -87,7 +104,10 @@ class ExampleBasedOptimizer(PromptOptimizer):
         else:
             example_max_tokens = self.example_generator_max_tokens or self.max_tokens
             if self.verbose:
-                LOGGER.info("Generating examples with example_generator_max_tokens=%s", example_max_tokens)
+                LOGGER.info(
+                    "Generating examples with example_generator_max_tokens=%s",
+                    example_max_tokens,
+                )
             generator = ExampleGenerator(
                 model=self.example_generator_model or "claude-3-5-haiku-latest",
                 api_key=self.example_generator_api_key or self.api_key,
