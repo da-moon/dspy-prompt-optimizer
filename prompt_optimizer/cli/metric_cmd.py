@@ -49,15 +49,36 @@ def _run_metric_optimization(
     verbose: bool,
 ) -> None:
     """Execute metric-based optimization workflow."""
-    api = validate_api_key(api_key)
-    prompt = read_input_prompt(input_prompt)
+    validated_api_key = validate_api_key(api_key)
+    prompt_text = read_input_prompt(input_prompt)
     echo_start("metric-based", model, max_tokens, verbose)
-    cfg = MetricBasedConfig(
+    config = _create_metric_config(
+        model, validated_api_key, max_iterations, max_tokens, verbose
+    )
+    optimized_prompt = _execute_metric_optimization(config, prompt_text)
+    write_output_with_logging(output, optimized_prompt, verbose)
+
+
+def _create_metric_config(
+    model: str,
+    api_key: str,
+    max_iterations: int,
+    max_tokens: int,
+    verbose: bool,
+) -> MetricBasedConfig:
+    """Create configuration for metric-based optimization."""
+    return MetricBasedConfig(
         model=model,
-        api_key=api,
+        api_key=api_key,
         max_iterations=max_iterations,
         max_tokens=max_tokens,
         verbose=verbose,
     )
-    optimizer = MetricBasedOptimizer(cfg)
-    write_output_with_logging(output, optimizer.optimize(prompt), verbose)
+
+
+def _execute_metric_optimization(
+    config: MetricBasedConfig, prompt_text: str
+) -> str:
+    """Execute the optimization using the provided configuration."""
+    optimizer = MetricBasedOptimizer(config)
+    return optimizer.optimize(prompt_text)
