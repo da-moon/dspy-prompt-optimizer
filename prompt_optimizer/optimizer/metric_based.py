@@ -8,12 +8,23 @@ from typing import Final
 import dspy
 
 from .base import PromptOptimizer
+from .strategies import MetricBasedConfig, OptimizationStrategy
 
 LOGGER: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-class MetricBasedOptimizer(PromptOptimizer):
+class MetricBasedOptimizer(PromptOptimizer, OptimizationStrategy):
     """Optimizer that uses metrics to improve prompts."""
+
+    def __init__(self, config: MetricBasedConfig) -> None:
+        """Initialize the optimizer with ``config``."""
+        super().__init__(
+            model=config.model,
+            api_key=config.api_key,
+            max_iterations=config.max_iterations,
+            max_tokens=config.max_tokens,
+            verbose=config.verbose,
+        )
 
     def optimize(self, prompt_text: str) -> str:
         """

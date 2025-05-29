@@ -9,6 +9,7 @@ import click
 
 if TYPE_CHECKING:
     from ..optimizer.example_based import ExampleBasedOptimizer
+from ..optimizer.strategies import ExampleBasedConfig
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -17,6 +18,7 @@ R = TypeVar("R")
 @dataclass
 class ExampleOptimizerConfig:
     """Configuration for creating an ExampleBasedOptimizer."""
+
     model: str
     api_key: str
     max_tokens: int
@@ -156,7 +158,7 @@ def create_example_optimizer(config: ExampleOptimizerConfig) -> ExampleBasedOpti
     """Return a configured :class:`ExampleBasedOptimizer`."""
     from ..optimizer.example_based import ExampleBasedOptimizer
 
-    return ExampleBasedOptimizer(
+    opt_config = ExampleBasedConfig(
         model=config.model,
         api_key=config.api_key,
         max_tokens=config.max_tokens,
@@ -165,5 +167,7 @@ def create_example_optimizer(config: ExampleOptimizerConfig) -> ExampleBasedOpti
         examples_file=config.examples_file,
         example_generator_model=config.example_generator_model,
         example_generator_api_key=config.example_generator_api_key,
-        example_generator_max_tokens=config.example_generator_max_tokens or config.max_tokens,
+        example_generator_max_tokens=config.example_generator_max_tokens
+        or config.max_tokens,
     )
+    return ExampleBasedOptimizer(opt_config)

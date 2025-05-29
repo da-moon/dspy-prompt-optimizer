@@ -50,7 +50,9 @@ def generate_examples_command(
     output_file: Path,
 ) -> None:
     """Generate examples for prompt optimization and save them to a file."""
-    _generate_and_save_examples(api_key, model, num_examples, max_tokens, verbose, output_file)
+    _generate_and_save_examples(
+        api_key, model, num_examples, max_tokens, verbose, output_file
+    )
 
 
 def _generate_and_save_examples(

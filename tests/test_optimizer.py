@@ -12,8 +12,11 @@ import prompt_optimizer.optimizer.example_based.optimizer as example_based_optim
 import prompt_optimizer.optimizer.metric_based as metric_based_module
 import prompt_optimizer.optimizer.self_refinement as self_refinement_module
 from prompt_optimizer.optimizer import (
+    ExampleBasedConfig,
     ExampleBasedOptimizer,
+    MetricBasedConfig,
     MetricBasedOptimizer,
+    SelfRefinementConfig,
     SelfRefinementOptimizer,
     optimize_prompt,
 )
@@ -99,20 +102,23 @@ def mock_dspy(monkeypatch: "MonkeyPatch") -> None:
 
 
 def test_self_refinement_optimizer(mock_dspy: None) -> None:
-    opt = SelfRefinementOptimizer(model="m", api_key="k", max_tokens=64000)
+    cfg = SelfRefinementConfig(model="m", api_key="k", max_tokens=64000)
+    opt = SelfRefinementOptimizer(cfg)
     result = opt.optimize("prompt")
     assert result == "improved"
 
 
 def test_example_based_optimizer(mock_dspy: None) -> None:
-    opt = ExampleBasedOptimizer(model="m", api_key="k", max_tokens=64000)
+    cfg = ExampleBasedConfig(model="m", api_key="k", max_tokens=64000)
+    opt = ExampleBasedOptimizer(cfg)
     result = opt.optimize("prompt")
     assert result == "improved"
 
 
 def test_example_based_optimizer_dspy_compatibility(mock_dspy: None) -> None:
     """Test that example-based optimizer doesn't use non-existent DSPy methods."""
-    opt = ExampleBasedOptimizer(model="m", api_key="k", max_tokens=64000)
+    cfg = ExampleBasedConfig(model="m", api_key="k", max_tokens=64000)
+    opt = ExampleBasedOptimizer(cfg)
 
     # This should not raise AttributeError about 'update_demos'
     # If the old code with update_demos was still there, this would fail
@@ -125,15 +131,15 @@ def test_example_based_optimizer_dspy_compatibility(mock_dspy: None) -> None:
 
 
 def test_metric_based_optimizer(mock_dspy: None) -> None:
-    opt = MetricBasedOptimizer(model="m", api_key="k", max_tokens=64000)
+    cfg = MetricBasedConfig(model="m", api_key="k", max_tokens=64000)
+    opt = MetricBasedOptimizer(cfg)
     result = opt.optimize("prompt")
     assert result == "improved"
 
 
 def test_metric_based_optimizer_with_custom_iterations(mock_dspy: None) -> None:
-    opt = MetricBasedOptimizer(
-        model="m", api_key="k", max_iterations=5, max_tokens=64000
-    )
+    cfg = MetricBasedConfig(model="m", api_key="k", max_iterations=5, max_tokens=64000)
+    opt = MetricBasedOptimizer(cfg)
     assert opt.max_iterations == 5
     result = opt.optimize("prompt")
     assert result == "improved"
@@ -141,45 +147,23 @@ def test_metric_based_optimizer_with_custom_iterations(mock_dspy: None) -> None:
 
 def test_optimize_prompt_function(mock_dspy: None) -> None:
     """Test the convenience function for each optimization type."""
-    # Test self-refinement (default)
-    result = optimize_prompt(
-        prompt_text="test prompt", model="model", api_key="api_key"
-    )
+    cfg = SelfRefinementConfig(model="model", api_key="api_key")
+    result = optimize_prompt("test prompt", SelfRefinementOptimizer(cfg))
     assert result == "improved"
 
     # Test example-based
-    result = optimize_prompt(
-        prompt_text="test prompt",
-        model="model",
-        api_key="api_key",
-        optimization_type="example",
-    )
+    ecfg = ExampleBasedConfig(model="model", api_key="api_key", max_tokens=64000)
+    result = optimize_prompt("test prompt", ExampleBasedOptimizer(ecfg))
     assert result == "improved"
 
     # Test metric-based
-    result = optimize_prompt(
-        prompt_text="test prompt",
-        model="model",
-        api_key="api_key",
-        optimization_type="metric",
-    )
+    mcfg = MetricBasedConfig(model="model", api_key="api_key", max_tokens=64000)
+    result = optimize_prompt("test prompt", MetricBasedOptimizer(mcfg))
     assert result == "improved"
 
     # Test metric-based with custom max_iterations
-    result = optimize_prompt(
-        prompt_text="test prompt",
-        model="model",
-        api_key="api_key",
-        optimization_type="metric",
-        max_iterations=5,
+    custom = MetricBasedConfig(
+        model="model", api_key="api_key", max_iterations=5, max_tokens=64000
     )
+    result = optimize_prompt("test prompt", MetricBasedOptimizer(custom))
     assert result == "improved"
-
-    # Test invalid optimization type
-    with pytest.raises(ValueError, match="Unknown optimization type"):
-        _ = optimize_prompt(
-            prompt_text="test prompt",
-            model="model",
-            api_key="api_key",
-            optimization_type="invalid",
-        )

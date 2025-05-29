@@ -5,6 +5,7 @@ from typing import Optional, TextIO
 import click
 
 from ..optimizer.self_refinement import SelfRefinementOptimizer
+from ..optimizer.strategies import SelfRefinementConfig
 from .common import (
     common_options,
     echo_start,
@@ -40,7 +41,8 @@ def _run_self_refinement(
     api = validate_api_key(api_key)
     prompt = read_input_prompt(input_prompt)
     echo_start("self-refinement", model, max_tokens, verbose)
-    optimizer = SelfRefinementOptimizer(
+    cfg = SelfRefinementConfig(
         model=model, api_key=api, max_tokens=max_tokens, verbose=verbose
     )
+    optimizer = SelfRefinementOptimizer(cfg)
     write_output_with_logging(output, optimizer.optimize(prompt), verbose)
